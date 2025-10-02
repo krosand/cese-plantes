@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adopte une Plante ! 🌿</title>
+  <!-- Bootstrap 5 CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .container {
+      max-width: 800px;
+    }
+    .question-card {
+      transition: all 0.3s ease;
+      border-left: 4px solid #4caf50;
+    }
+    .choice-btn {
+      text-align: left;
+      transition: all 0.2s;
+      border: 2px solid transparent;
+    }
+    .choice-btn:hover {
+      background-color: #e8f5e9;
+      border-color: #4caf50;
+    }
+    .choice-btn.selected {
+      background-color: #4caf50;
+      color: white;
+      border-color: #2e7d32;
+    }
+    .plant-card {
+      transition: transform 0.3s;
+      border-top: 4px solid #4caf50;
+    }
+    .plant-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    }
+    .emoji-large {
+      font-size: 4rem;
+    }
+    .progress {
+      height: 8px;
+    }
+    .family-badge {
+      font-size: 1.5rem;
+      padding: 1rem 2rem;
+    }
+    .nav-links {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <div class="nav-links">
+    <a href="/stats.html" class="btn btn-outline-primary btn-sm me-2">📊 Stats</a>
+    <a href="/admin.html" class="btn btn-outline-secondary btn-sm">⚙️ Admin</a>
+  </div>
+
+  <div class="container py-5">
+    <!-- En-tête -->
+    <div class="text-center mb-5">
+      <h1 class="display-3 fw-bold text-success">🌿 Adopte une Plante !</h1>
+      <p class="lead text-secondary">Trouvez la plante parfaite pour vous en quelques questions</p>
+    </div>
+
+    <!-- Barre de progression -->
+    <div id="progressBar" class="mb-4" style="display: none;">
+      <div class="d-flex justify-content-between mb-2">
+        <span class="text-muted">Progression</span>
+        <span class="text-muted"><span id="currentQuestion">0</span> / <span id="totalQuestions">0</span></span>
+      </div>
+      <div class="progress">
+        <div id="progressBarFill" class="progress-bar bg-success" role="progressbar" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <!-- Zone questions -->
+    <div id="questionsContainer"></div>
+
+    <!-- Bouton soumettre -->
+    <div id="submitContainer" class="text-center mt-4" style="display: none;">
+      <button id="submitBtn" class="btn btn-success btn-lg px-5">
+        ✨ Voir mon résultat
+      </button>
+    </div>
+
+    <!-- Zone résultat -->
+    <div id="resultContainer" style="display: none;">
+      <div class="text-center mb-4">
+        <h2 class="display-5 mb-3">🎉 Votre plante idéale :</h2>
+        <span id="familyBadge" class="badge family-badge bg-success"></span>
+      </div>
+
+      <div class="alert alert-info">
+        <strong>Pourquoi cette famille ?</strong>
+        <p id="familyExplanation" class="mb-0 mt-2"></p>
+      </div>
+
+      <h3 class="text-center mb-4">Nos recommandations pour vous :</h3>
+      <div id="plantsContainer" class="row g-4"></div>
+
+      <div class="text-center mt-5">
+        <button id="resetBtn" class="btn btn-outline-danger">
+          🔄 Recommencer le test
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // État de l'application
+    let questions = [];
+    let answers = [];
+
+    // Descriptions des familles
+    const familyDescriptions = {
+      'Dépolluante': 'Ces plantes purificatrices d\'air sont parfaites pour assainir votre intérieur. Idéales pour bureau et chambre !',
+      'Grimpante': 'Ces plantes décoratives apportent une touche jungle à votre espace. Parfaites pour créer un mur végétal !',
+      'Exotique': 'Ces plantes zen et raffinées créent une ambiance paisible. Pour les amateurs d\'esthétique et de méditation !',
+      'Résistante': 'Ces plantes robustes pardonnent tous les oublis. Parfaites pour débutants et personnes occupées !'
+    };
+
+    // Charger questions au démarrage
+    async function loadQuestions() {
+      try {
+        const response = await fetch('/api/questions');
+        questions = await response.json();
+        answers = new Array(questions.length).fill(null);
+        renderQuestions();
+        updateProgress();
+      } catch (err) {
+        alert('Erreur lors du chargement des questions');
+        console.error(err);
+      }
+    }
+
+    // Afficher les questions
+    function renderQuestions() {
+      const container = document.getElementById('questionsContainer');
+      container.innerHTML = '';
+
+      questions.forEach((question, qIdx) => {
+        const card = document.createElement('div');
+        card.className = 'card question-card mb-4 shadow-sm';
+        card.innerHTML = `
+          <div class="card-body">
+            <h5 class="card-title fw-bold text-success">
+              Question ${qIdx + 1} / ${questions.length}
+            </h5>
+            <p class="card-text fs-5 mb-3">${question.text}</p>
+            <div class="d-grid gap-2" id="choices-${qIdx}">
+              ${question.choices.map((choice, cIdx) => `
+                <button class="btn btn-outline-secondary choice-btn"
+                        data-question="${qIdx}"
+                        data-choice="${cIdx}">
+                  ${choice.label}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      // Ajouter événements sur les boutons
+      document.querySelectorAll('.choice-btn').forEach(btn => {
+        btn.addEventListener('click', handleChoice);
+      });
+
+      // Restaurer sélections depuis localStorage
+      restoreAnswers();
+
+      document.getElementById('progressBar').style.display = 'block';
+      document.getElementById('totalQuestions').textContent = questions.length;
+    }
+
+    // Gérer sélection réponse
+    function handleChoice(e) {
+      const questionIdx = parseInt(e.target.dataset.question);
+      const choiceIdx = parseInt(e.target.dataset.choice);
+
+      // Enregistrer réponse
+      answers[questionIdx] = choiceIdx;
+      saveAnswers();
+
+      // Mettre à jour UI
+      const choicesContainer = document.getElementById(`choices-${questionIdx}`);
+      choicesContainer.querySelectorAll('.choice-btn').forEach(btn => {
+        btn.classList.remove('selected');
+      });
+      e.target.classList.add('selected');
+
+      updateProgress();
+    }
+
+    // Mettre à jour progression
+    function updateProgress() {
+      const answered = answers.filter(a => a !== null).length;
+      const total = questions.length;
+      const percentage = (answered / total) * 100;
+
+      document.getElementById('currentQuestion').textContent = answered;
+      document.getElementById('progressBarFill').style.width = percentage + '%';
+
+      // Afficher bouton soumettre si toutes réponses données
+      if (answered === total) {
+        document.getElementById('submitContainer').style.display = 'block';
+      } else {
+        document.getElementById('submitContainer').style.display = 'none';
+      }
+    }
+
+    // Sauvegarder réponses dans localStorage
+    function saveAnswers() {
+      localStorage.setItem('plantQuizAnswers', JSON.stringify(answers));
+    }
+
+    // Restaurer réponses depuis localStorage
+    function restoreAnswers() {
+      const saved = localStorage.getItem('plantQuizAnswers');
+      if (saved) {
+        const savedAnswers = JSON.parse(saved);
+        if (savedAnswers.length === questions.length) {
+          answers = savedAnswers;
+
+          // Restaurer sélections visuelles
+          answers.forEach((choiceIdx, qIdx) => {
+            if (choiceIdx !== null) {
+              const btn = document.querySelector(
+                `[data-question="${qIdx}"][data-choice="${choiceIdx}"]`
+              );
+              if (btn) btn.classList.add('selected');
+            }
+          });
+
+          updateProgress();
+        }
+      }
+    }
+
+    // Soumettre réponses
+    async function submitAnswers() {
+      try {
+        const response = await fetch('/api/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ answers })
+        });
+
+        const result = await response.json();
+        displayResult(result);
+      } catch (err) {
+        alert('Erreur lors de la soumission');
+        console.error(err);
+      }
+    }
+
+    // Afficher résultat
+    function displayResult(result) {
+      // Masquer questions et bouton
+      document.getElementById('questionsContainer').style.display = 'none';
+      document.getElementById('submitContainer').style.display = 'none';
+      document.getElementById('progressBar').style.display = 'none';
+
+      // Afficher résultat
+      document.getElementById('familyBadge').textContent = result.family;
+      document.getElementById('familyExplanation').textContent =
+        familyDescriptions[result.family] || '';
+
+      // Afficher plantes
+      const plantsContainer = document.getElementById('plantsContainer');
+      plantsContainer.innerHTML = '';
+
+      result.plants.forEach(plant => {
+        const col = document.createElement('div');
+        col.className = 'col-md-6';
+        col.innerHTML = `
+          <div class="card plant-card h-100 shadow-sm">
+            <div class="card-body">
+              <div class="text-center mb-3">
+                <div class="emoji-large">${plant.image}</div>
+                <h4 class="card-title mt-2">${plant.name}</h4>
+              </div>
+              <p class="card-text text-muted">${plant.description}</p>
+
+              <h6 class="text-success mt-3">💧 Arrosage</h6>
+              <p class="mb-2">${plant.care.arrosage}</p>
+
+              <h6 class="text-success">☀️ Lumière</h6>
+              <p class="mb-2">${plant.care.lumiere}</p>
+
+              <h6 class="text-success">🌡️ Température</h6>
+              <p class="mb-2">${plant.care.temperature}</p>
+
+              <h6 class="text-success">📊 Difficulté</h6>
+              <p class="mb-2">${plant.care.difficulte}</p>
+
+              <div class="alert alert-success mt-3 mb-0">
+                <strong>✨ Avantages :</strong><br>
+                ${plant.benefits}
+              </div>
+            </div>
+          </div>
+        `;
+        plantsContainer.appendChild(col);
+      });
+
+      document.getElementById('resultContainer').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Réinitialiser le test
+    function resetQuiz() {
+      localStorage.removeItem('plantQuizAnswers');
+      answers = new Array(questions.length).fill(null);
+
+      document.getElementById('resultContainer').style.display = 'none';
+      document.getElementById('questionsContainer').style.display = 'block';
+
+      renderQuestions();
+      updateProgress();
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Événements
+    document.getElementById('submitBtn').addEventListener('click', submitAnswers);
+    document.getElementById('resetBtn').addEventListener('click', resetQuiz);
+
+    // Initialisation
+    loadQuestions();
+  </script>
+</body>
+</html>

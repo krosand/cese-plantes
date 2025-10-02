@@ -1,0 +1,275 @@
+[
+  {
+    "id": 1,
+    "text": "Comment décririez-vous votre personnalité au travail ?",
+    "choices": [
+      {
+        "label": "Méthodique et organisé(e) - j'aime la routine",
+        "scores": {
+          "Résistante": 3,
+          "Dépolluante": 2,
+          "Grimpante": 1,
+          "Exotique": 0
+        }
+      },
+      {
+        "label": "Créatif(ve) et dynamique - j'aime le changement",
+        "scores": {
+          "Résistante": 0,
+          "Dépolluante": 1,
+          "Grimpante": 3,
+          "Exotique": 2
+        }
+      },
+      {
+        "label": "Calme et réfléchi(e) - j'aime la sérénité",
+        "scores": {
+          "Résistante": 1,
+          "Dépolluante": 2,
+          "Grimpante": 0,
+          "Exotique": 3
+        }
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "text": "Quelle est votre relation avec les responsabilités ?",
+    "choices": [
+      {
+        "label": "Je préfère les choses simples et autonomes",
+        "scores": {
+          "Résistante": 3,
+          "Dépolluante": 1,
+          "Grimpante": 0,
+          "Exotique": 0
+        }
+      },
+      {
+        "label": "J'aime un équilibre entre soin et liberté",
+        "scores": {
+          "Résistante": 2,
+          "Dépolluante": 2,
+          "Grimpante": 1,
+          "Exotique": 1
+        }
+      },
+      {
+        "label": "J'adore prendre soin et observer l'évolution",
+        "scores": {
+          "Résistante": 0,
+          "Dépolluante": 1,
+          "Grimpante": 2,
+          "Exotique": 3
+        }
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "text": "Quelle est la luminosité de votre bureau ?",
+    "choices": [
+      {
+        "label": "Peu de lumière naturelle",
+        "scores": {
+          "Résistante": 2,
+          "Dépolluante": 3,
+          "Grimpante": 1,
+          "Exotique": 0
+        }
+      },
+      {
+        "label": "Lumière indirecte moyenne",
+        "scores": {
+          "Résistante": 1,
+          "Dépolluante": 2,
+          "Grimpante": 2,
+          "Exotique": 1
+        }
+      },
+      {
+        "label": "Très lumineux, près d'une fenêtre",
+        "scores": {
+          "Résistante": 2,
+          "Dépolluante": 0,
+          "Grimpante": 1,
+          "Exotique": 3
+        }
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "text": "Comment gérez-vous votre espace de travail ?",
+    "choices": [
+      {
+        "label": "Minimaliste - peu d'objets sur mon bureau",
+        "scores": {
+          "Résistante": 2,
+          "Dépolluante": 3,
+          "Grimpante": 0,
+          "Exotique": 1
+        }
+      },
+      {
+        "label": "Équilibré - quelques décorations personnelles",
+        "scores": {
+          "Résistante": 1,
+          "Dépolluante": 2,
+          "Grimpante": 2,
+          "Exotique": 2
+        }
+      },
+      {
+        "label": "Vivant - j'adore avoir de la verdure autour",
+        "scores": {
+          "Résistante": 0,
+          "Dépolluante": 1,
+          "Grimpante": 3,
+          "Exotique": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "text": "Qu'est-ce qui vous motive dans votre environnement de travail ?",
+    "choices": [
+      {
+        "label": "Un air sain et purifié",
+        "scores": {
+          "Résistante": 0,
+          "Dépolluante": 3,
+          "Grimpante": 1,
+          "Exotique": 0
+        }
+      },
+      {
+        "label": "Une ambiance verte et vivante",
+        "scores": {
+          "Résistante": 1,
+          "Dépolluante": 1,
+          "Grimpante": 3,
+          "Exotique": 1
+        }
+      },
+      {
+        "label": "Un espace zen et apaisant",
+        "scores": {
+          "Résistante": 0,
+          "Dépolluante": 0,
+          "Grimpante": 1,
+          "Exotique": 3
+        }
+      },
+      {
+        "label": "La simplicité sans contrainte",
+        "scores": {
+          "Résistante": 3,
+          "Dépolluante": 1,
+          "Grimpante": 0,
+          "Exotique": 0
+        }
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "text": "Comment réagissez-vous face aux imprévus ?",
+    "choices": [
+      {
+        "label": "Je préfère que tout soit sous contrôle",
+        "scores": {
+          "Résistante": 3,
+          "Dépolluante": 2,
+          "Grimpante": 0,
+          "Exotique": 0
+        }
+      },
+      {
+        "label": "Je m'adapte facilement aux changements",
+        "scores": {
+          "Résistante": 1,
+          "Dépolluante": 1,
+          "Grimpante": 2,
+          "Exotique": 2
+        }
+      },
+      {
+        "label": "J'aime relever des défis et apprendre",
+        "scores": {
+          "Résistante": 0,
+          "Dépolluante": 1,
+          "Grimpante": 2,
+          "Exotique": 3
+        }
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "text": "Quel rythme de travail vous correspond le mieux ?",
+    "choices": [
+      {
+        "label": "Régulier et stable - j'aime la constance",
+        "scores": {
+          "Résistante": 3,
+          "Dépolluante": 2,
+          "Grimpante": 1,
+          "Exotique": 0
+        }
+      },
+      {
+        "label": "Modéré avec quelques variations",
+        "scores": {
+          "Résistante": 1,
+          "Dépolluante": 2,
+          "Grimpante": 2,
+          "Exotique": 1
+        }
+      },
+      {
+        "label": "Intense et stimulant - j'aime l'action",
+        "scores": {
+          "Résistante": 0,
+          "Dépolluante": 1,
+          "Grimpante": 2,
+          "Exotique": 3
+        }
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "text": "Quelle place donnez-vous à la nature dans votre quotidien ?",
+    "choices": [
+      {
+        "label": "Discrète - une touche suffit",
+        "scores": {
+          "Résistante": 2,
+          "Dépolluante": 3,
+          "Grimpante": 0,
+          "Exotique": 1
+        }
+      },
+      {
+        "label": "Présente - j'aime avoir du vert autour",
+        "scores": {
+          "Résistante": 1,
+          "Dépolluante": 2,
+          "Grimpante": 2,
+          "Exotique": 2
+        }
+      },
+      {
+        "label": "Essentielle - la nature me ressource",
+        "scores": {
+          "Résistante": 0,
+          "Dépolluante": 1,
+          "Grimpante": 3,
+          "Exotique": 3
+        }
+      }
+    ]
+  }
+]

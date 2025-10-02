@@ -1,0 +1,154 @@
+{
+  "Dépolluante": [
+    {
+      "name": "Sansevieria (Langue de belle-mère)",
+      "image": "🌿",
+      "description": "Plante de bureau idéale qui purifie l'air 24h/24, même dans les espaces peu ventilés. Ultra-résistante aux conditions d'intérieur.",
+      "care": {
+        "arrosage": "1 fois toutes les 3 semaines",
+        "lumiere": "Tolère les bureaux peu lumineux",
+        "temperature": "18-28°C (bureaux climatisés)",
+        "difficulte": "Très facile - parfaite débutants"
+      },
+      "benefits": "Filtre formaldéhyde et benzène des meubles, imprimantes et produits d'entretien"
+    },
+    {
+      "name": "Pothos (Scindapsus doré)",
+      "image": "🍃",
+      "description": "Champion de la dépollution d'intérieur. Feuilles en forme de cœur, croissance rapide, parfaite en suspension ou étagère.",
+      "care": {
+        "arrosage": "1 fois par semaine",
+        "lumiere": "S'adapte à tout éclairage intérieur",
+        "temperature": "18-26°C",
+        "difficulte": "Très facile"
+      },
+      "benefits": "Absorbe CO2, formaldéhyde et benzène. Humidifie l'air sec des bureaux climatisés"
+    },
+    {
+      "name": "Spathiphyllum (Fleur de lune)",
+      "image": "🌱",
+      "description": "Élégantes fleurs blanches, reconnue par la NASA comme une des meilleures plantes dépolluantes d'intérieur.",
+      "care": {
+        "arrosage": "2 fois par semaine, terre humide",
+        "lumiere": "Mi-ombre, loin des fenêtres",
+        "temperature": "18-25°C",
+        "difficulte": "Facile"
+      },
+      "benefits": "Élimine ammoniaque, benzène, formaldéhyde et trichloréthylène. Indicateur visuel: feuilles tombantes = soif"
+    }
+  ],
+  "Grimpante": [
+    {
+      "name": "Monstera Deliciosa",
+      "image": "🌴",
+      "description": "Star Instagram des bureaux modernes. Grandes feuilles perforées spectaculaires, parfaite pour espaces de réunion et open-spaces.",
+      "care": {
+        "arrosage": "1 fois par semaine, moins en hiver",
+        "lumiere": "Lumière indirecte vive (près fenêtre)",
+        "temperature": "18-27°C",
+        "difficulte": "Moyenne"
+      },
+      "benefits": "Forte présence décorative, humidifie l'air, améliore acoustique des espaces"
+    },
+    {
+      "name": "Philodendron Scandens",
+      "image": "🌿",
+      "description": "Plante grimpante ou retombante adaptable. Feuillage brillant dense, parfaite pour étagères hautes ou murs végétaux d'intérieur.",
+      "care": {
+        "arrosage": "Quand terreau sec en surface",
+        "lumiere": "Mi-ombre à lumière indirecte",
+        "temperature": "16-24°C",
+        "difficulte": "Facile"
+      },
+      "benefits": "Purifie l'air, croissance vigoureuse, crée séparation visuelle naturelle dans open-space"
+    },
+    {
+      "name": "Epipremnum (Lierre du diable)",
+      "image": "🍀",
+      "description": "Plante bureau par excellence. Retombante ou grimpante sur tuteur, feuillage panaché lumineux, quasi indestructible.",
+      "care": {
+        "arrosage": "1 fois par semaine",
+        "lumiere": "S'adapte aux néons et lumière naturelle",
+        "temperature": "15-25°C",
+        "difficulte": "Très facile"
+      },
+      "benefits": "Filtre polluants bureautiques, pousse même sous éclairage artificiel, parfaite en hauteur"
+    }
+  ],
+  "Exotique": [
+    {
+      "name": "Orchidée Phalaenopsis",
+      "image": "🌸",
+      "description": "Élégance zen pour bureaux de direction et espaces d'accueil. Floraison spectaculaire de 2-3 mois, ambiance raffinée.",
+      "care": {
+        "arrosage": "1 fois par semaine par trempage 15min",
+        "lumiere": "Lumière indirecte (voilages)",
+        "temperature": "18-24°C - éviter climatisation directe",
+        "difficulte": "Moyenne"
+      },
+      "benefits": "Floraison longue, apporte couleur et sérénité, entretien espacé compatible agenda chargé"
+    },
+    {
+      "name": "Ficus Ginseng (Bonsaï)",
+      "image": "🎋",
+      "description": "Mini-arbre d'art vivant pour bureaux individuels. Tronc racinaire sculpté, symbolise longévité et sagesse.",
+      "care": {
+        "arrosage": "2-3 fois par semaine, terreau jamais sec",
+        "lumiere": "Pleine lumière (rebord fenêtre)",
+        "temperature": "15-25°C",
+        "difficulte": "Moyenne à difficile"
+      },
+      "benefits": "Objet de contemplation anti-stress, stimule concentration, purification légère"
+    },
+    {
+      "name": "Anthurium",
+      "image": "🌺",
+      "description": "Fleurs vernissées rouges/roses en forme de cœur. Tropical chic pour salles d'attente et espaces communs.",
+      "care": {
+        "arrosage": "2 fois par semaine, vaporiser feuilles",
+        "lumiere": "Lumière vive sans soleil direct",
+        "temperature": "20-25°C",
+        "difficulte": "Moyenne"
+      },
+      "benefits": "Floraison continue toute l'année, dépolluant, ajoute couleur vivante aux espaces neutres"
+    }
+  ],
+  "Résistante": [
+    {
+      "name": "Cactus de bureau (assortiment)",
+      "image": "🌵",
+      "description": "Compagnons parfaits pour bureaux individuels. Variété de formes, demandent quasiment zéro entretien. Idéal voyageurs d'affaires.",
+      "care": {
+        "arrosage": "1 fois par mois (hiver: 0)",
+        "lumiere": "Plein soleil (rebord fenêtre)",
+        "temperature": "15-30°C - tolère tout",
+        "difficulte": "Très facile - quasi immortel"
+      },
+      "benefits": "Aucun oubli fatal, design minimaliste moderne, nécessite espace minimal sur bureau"
+    },
+    {
+      "name": "Zamioculcas (Plante ZZ)",
+      "image": "🌿",
+      "description": "LA plante increvable des bureaux. Feuillage brillant architectural, survit aux vacances prolongées et éclairage artificiel.",
+      "care": {
+        "arrosage": "1 fois toutes les 3 semaines",
+        "lumiere": "Pousse même sans fenêtre (néons suffisants)",
+        "temperature": "15-28°C",
+        "difficulte": "Très facile"
+      },
+      "benefits": "Résiste climatisation, chauffage, oublis. Filtre xylène et toluène. Parfaite salles de réunion"
+    },
+    {
+      "name": "Succulentes (Echeveria, Crassula)",
+      "image": "🌿",
+      "description": "Mini plantes grasses décoratives pour petits espaces. Design moderne, collection possible, aucune exigence.",
+      "care": {
+        "arrosage": "1 fois toutes les 2 semaines",
+        "lumiere": "Lumière vive",
+        "temperature": "15-28°C",
+        "difficulte": "Très facile"
+      },
+      "benefits": "Prennent peu de place, aspect zen/moderne, parfaites open-space et bureaux partagés"
+    }
+  ]
+}

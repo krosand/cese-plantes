@@ -1,0 +1,15 @@
+{
+  "name": "adopte-une-plante",
+  "version": "1.0.0",
+  "description": "Prototype démo pour recommander des plantes selon profil utilisateur",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": ["plantes", "quiz", "recommandation"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

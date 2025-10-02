@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Statistiques - Adopte une Plante</title>
+  <!-- Bootstrap 5 CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.js"></script>
+  <style>
+    body {
+      background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+      min-height: 100vh;
+    }
+    .stat-card {
+      transition: transform 0.2s;
+      border-top: 4px solid;
+    }
+    .stat-card:hover {
+      transform: translateY(-5px);
+    }
+    .stat-card.primary { border-color: #2196f3; }
+    .stat-card.success { border-color: #4caf50; }
+    .stat-card.warning { border-color: #ff9800; }
+    .stat-card.info { border-color: #00bcd4; }
+    .chart-container {
+      position: relative;
+      height: 300px;
+    }
+    .stat-number {
+      font-size: 3rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-dark bg-primary mb-4">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/">
+        <span class="fs-4">🌿 Adopte une Plante - Statistiques</span>
+      </a>
+      <div>
+        <a href="/" class="btn btn-light btn-sm me-2">🏠 Accueil</a>
+        <a href="/admin.html" class="btn btn-outline-light btn-sm">⚙️ Admin</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid px-4">
+    <!-- KPIs en haut -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-3">
+        <div class="card stat-card primary shadow-sm">
+          <div class="card-body text-center">
+            <h6 class="text-muted text-uppercase mb-2">Participants</h6>
+            <div class="stat-number text-primary" id="totalParticipants">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card stat-card success shadow-sm">
+          <div class="card-body text-center">
+            <h6 class="text-muted text-uppercase mb-2">Taux de complétion</h6>
+            <div class="stat-number text-success" id="completionRate">0%</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card stat-card warning shadow-sm">
+          <div class="card-body text-center">
+            <h6 class="text-muted text-uppercase mb-2">Famille favorite</h6>
+            <div class="h3 fw-bold text-warning mt-3" id="topFamily">-</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card stat-card info shadow-sm">
+          <div class="card-body text-center">
+            <h6 class="text-muted text-uppercase mb-2">Dernière soumission</h6>
+            <div class="h5 fw-bold text-info mt-3" id="lastSubmission">-</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Graphiques -->
+    <div class="row g-4 mb-4">
+      <!-- Distribution par famille -->
+      <div class="col-lg-6">
+        <div class="card shadow-sm">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">📊 Distribution par famille</h5>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="familyChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Camembert familles -->
+      <div class="col-lg-6">
+        <div class="card shadow-sm">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0">🥧 Répartition des familles</h5>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="pieChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Timeline et réponses par question -->
+    <div class="row g-4 mb-4">
+      <!-- Timeline -->
+      <div class="col-lg-8">
+        <div class="card shadow-sm">
+          <div class="card-header bg-info text-white">
+            <h5 class="mb-0">📈 Timeline des soumissions</h5>
+          </div>
+          <div class="card-body">
+            <div class="chart-container" style="height: 250px;">
+              <canvas id="timelineChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Réponses question 1 (exemple) -->
+      <div class="col-lg-4">
+        <div class="card shadow-sm">
+          <div class="card-header bg-warning text-white">
+            <h5 class="mb-0">❓ Question 1</h5>
+          </div>
+          <div class="card-body">
+            <div class="chart-container" style="height: 250px;">
+              <canvas id="question1Chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Détails questions -->
+    <div class="row g-4 mb-4">
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">📋 Réponses par question</h5>
+          </div>
+          <div class="card-body">
+            <div id="questionsDetails"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    let stats = null;
+    let questions = [];
+
+    // Couleurs pour les familles
+    const familyColors = {
+      'Dépolluante': '#4caf50',
+      'Grimpante': '#2196f3',
+      'Exotique': '#ff9800',
+      'Résistante': '#9c27b0'
+    };
+
+    // Charger statistiques
+    async function loadStats() {
+      try {
+        const [statsRes, questionsRes] = await Promise.all([
+          fetch('/api/stats/summary'),
+          fetch('/api/questions')
+        ]);
+
+        stats = await statsRes.json();
+        questions = await questionsRes.json();
+
+        updateKPIs();
+        renderCharts();
+        renderQuestionDetails();
+      } catch (err) {
+        console.error('Erreur chargement stats:', err);
+        alert('Erreur lors du chargement des statistiques');
+      }
+    }
+
+    // Mettre à jour KPIs
+    function updateKPIs() {
+      document.getElementById('totalParticipants').textContent = stats.totalParticipants;
+      document.getElementById('completionRate').textContent = stats.completionRate + '%';
+      document.getElementById('topFamily').textContent = stats.topFamily || '-';
+
+      // Dernière soumission
+      if (stats.timeline && stats.timeline.length > 0) {
+        const lastDate = stats.timeline[stats.timeline.length - 1].date;
+        document.getElementById('lastSubmission').textContent = new Date(lastDate).toLocaleDateString('fr-FR');
+      }
+    }
+
+    // Créer graphiques
+    function renderCharts() {
+      // 1. Histogramme distribution familles
+      const familyData = Object.entries(stats.familyDistribution);
+      new Chart(document.getElementById('familyChart'), {
+        type: 'bar',
+        data: {
+          labels: familyData.map(([family]) => family),
+          datasets: [{
+            label: 'Nombre de participants',
+            data: familyData.map(([, count]) => count),
+            backgroundColor: familyData.map(([family]) => familyColors[family]),
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
+      });
+
+      // 2. Camembert familles
+      new Chart(document.getElementById('pieChart'), {
+        type: 'pie',
+        data: {
+          labels: familyData.map(([family]) => family),
+          datasets: [{
+            data: familyData.map(([, count]) => count),
+            backgroundColor: familyData.map(([family]) => familyColors[family]),
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom' }
+          }
+        }
+      });
+
+      // 3. Timeline
+      const sortedTimeline = stats.timeline.sort((a, b) =>
+        new Date(a.date) - new Date(b.date)
+      );
+
+      new Chart(document.getElementById('timelineChart'), {
+        type: 'line',
+        data: {
+          labels: sortedTimeline.map(t => new Date(t.date).toLocaleDateString('fr-FR')),
+          datasets: [{
+            label: 'Soumissions par jour',
+            data: sortedTimeline.map(t => t.count),
+            borderColor: '#2196f3',
+            backgroundColor: 'rgba(33, 150, 243, 0.1)',
+            tension: 0.4,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
+      });
+
+      // 4. Question 1 exemple
+      if (questions[0] && stats.questionAnswers['0']) {
+        const q1Data = stats.questionAnswers['0'];
+        const labels = questions[0].choices.map(c => c.label.substring(0, 30) + '...');
+        const values = Object.values(q1Data);
+
+        new Chart(document.getElementById('question1Chart'), {
+          type: 'doughnut',
+          data: {
+            labels: labels,
+            datasets: [{
+              data: values,
+              backgroundColor: ['#4caf50', '#2196f3', '#ff9800']
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: true,
+                position: 'bottom',
+                labels: { font: { size: 10 } }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    // Afficher détails questions
+    function renderQuestionDetails() {
+      const container = document.getElementById('questionsDetails');
+      container.innerHTML = '';
+
+      questions.forEach((question, qIdx) => {
+        const answers = stats.questionAnswers[qIdx];
+        if (!answers) return;
+
+        const total = Object.values(answers).reduce((sum, val) => sum + val, 0);
+
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'mb-4';
+        questionDiv.innerHTML = `
+          <h6 class="fw-bold">Question ${qIdx + 1}: ${question.text}</h6>
+          <div class="mt-2">
+            ${question.choices.map((choice, cIdx) => {
+              const count = answers[cIdx] || 0;
+              const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
+              return `
+                <div class="mb-2">
+                  <div class="d-flex justify-content-between mb-1">
+                    <small class="text-muted">${choice.label}</small>
+                    <small class="text-muted fw-bold">${count} (${percentage}%)</small>
+                  </div>
+                  <div class="progress" style="height: 20px;">
+                    <div class="progress-bar bg-success" style="width: ${percentage}%"></div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+        container.appendChild(questionDiv);
+      });
+    }
+
+    // Auto-refresh toutes les 30 secondes
+    setInterval(loadStats, 30000);
+
+    // Charger au démarrage
+    loadStats();
+  </script>
+</body>
+</html>
