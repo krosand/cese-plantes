@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Images</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container py-5">
+    <h1>Test des Images des Plantes</h1>
+
+    <h2 class="mt-4">Images avec chemins relatifs</h2>
+    <div class="row g-3">
+      <div class="col-md-3">
+        <img src="images/plantes/sansevieria.jpg" class="img-fluid" alt="Sansevieria">
+        <p>sansevieria.jpg</p>
+      </div>
+      <div class="col-md-3">
+        <img src="images/plantes/pothos.jpg" class="img-fluid" alt="Pothos">
+        <p>pothos.jpg</p>
+      </div>
+      <div class="col-md-3">
+        <img src="images/plantes/monstera.jpg" class="img-fluid" alt="Monstera">
+        <p>monstera.jpg</p>
+      </div>
+      <div class="col-md-3">
+        <img src="images/plantes/orchidee.jpg" class="img-fluid" alt="Orchidée">
+        <p>orchidee.jpg</p>
+      </div>
+    </div>
+
+    <h2 class="mt-4">Test du basePath JavaScript</h2>
+    <div id="info"></div>
+    <div id="test-images" class="row g-3 mt-2"></div>
+  </div>
+
+  <script src="config.js"></script>
+  <script>
+    // Afficher les infos de config
+    document.getElementById('info').innerHTML = `
+      <div class="alert alert-info">
+        <strong>Configuration détectée :</strong><br>
+        - window.location.pathname: ${window.location.pathname}<br>
+        - APP_CONFIG.basePath: ${APP_CONFIG.basePath}<br>
+        - Test chemin image: ${APP_CONFIG.basePath}/images/plantes/cactus.jpg
+      </div>
+    `;
+
+    // Charger les plantes depuis l'API
+    apiCall('/api/plants/Résistante')
+      .then(plants => {
+        const container = document.getElementById('test-images');
+        plants.forEach(plant => {
+          const imagePath = plant.image.startsWith('http')
+            ? plant.image
+            : (APP_CONFIG.basePath ? `${APP_CONFIG.basePath}/${plant.image}` : plant.image);
+
+          container.innerHTML += `
+            <div class="col-md-3">
+              <img src="${imagePath}" class="img-fluid" alt="${plant.name}">
+              <p><small>${plant.name}</small></p>
+              <p><small class="text-muted">Chemin: ${imagePath}</small></p>
+            </div>
+          `;
+        });
+      })
+      .catch(err => {
+        document.getElementById('test-images').innerHTML =
+          `<div class="alert alert-danger">Erreur: ${err.message}</div>`;
+      });
+  </script>
+</body>
+</html>
