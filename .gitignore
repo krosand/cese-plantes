@@ -16,3 +16,7 @@ Thumbs.db
 # Environment variables
 .env
 .env.local
+
+# Logs PM2
+logs/
+*.log

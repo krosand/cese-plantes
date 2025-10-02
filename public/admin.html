@@ -91,8 +91,8 @@
         <hr class="bg-white my-4">
 
         <div class="mt-auto">
-          <a href="/" class="btn btn-light btn-sm w-100 mb-2">🏠 Accueil</a>
-          <a href="/stats.html" class="btn btn-outline-light btn-sm w-100">📊 Stats</a>
+          <a href="index.html" class="btn btn-light btn-sm w-100 mb-2">🏠 Accueil</a>
+          <a href="stats.html" class="btn btn-outline-light btn-sm w-100">📊 Stats</a>
         </div>
       </div>
 
@@ -255,6 +255,8 @@
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Config -->
+  <script src="config.js"></script>
 
   <script>
     let questionsData = [];
@@ -303,8 +305,7 @@
     // Charger questions
     async function loadQuestions() {
       try {
-        const response = await fetch('/api/admin/questions');
-        questionsData = await response.json();
+        questionsData = await apiCall('/api/admin/questions');
         document.getElementById('questionsEditor').value = JSON.stringify(questionsData, null, 2);
         document.getElementById('questionsCount').textContent = questionsData.length + ' questions';
       } catch (err) {
@@ -318,13 +319,12 @@
         const content = document.getElementById('questionsEditor').value;
         const questions = JSON.parse(content);
 
-        const response = await fetch('/api/admin/questions', {
+        const result = await apiCall('/api/admin/questions', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ questions })
         });
 
-        const result = await response.json();
         if (result.success) {
           showSuccess('Questions sauvegardées avec succès');
           loadQuestions();
@@ -342,8 +342,7 @@
     // Charger plantes
     async function loadPlants() {
       try {
-        const response = await fetch('/api/admin/plants');
-        plantsData = await response.json();
+        plantsData = await apiCall('/api/admin/plants');
         document.getElementById('plantsEditor').value = JSON.stringify(plantsData, null, 2);
 
         const total = Object.values(plantsData).reduce((sum, arr) => sum + arr.length, 0);
@@ -359,13 +358,12 @@
         const content = document.getElementById('plantsEditor').value;
         const plants = JSON.parse(content);
 
-        const response = await fetch('/api/admin/plants', {
+        const result = await apiCall('/api/admin/plants', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ plants })
         });
 
-        const result = await response.json();
         if (result.success) {
           showSuccess('Plantes sauvegardées avec succès');
           loadPlants();
@@ -394,13 +392,11 @@
       btn.textContent = '⏳ Génération...';
 
       try {
-        const response = await fetch('/api/admin/seed', {
+        const result = await apiCall('/api/admin/seed', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ count })
         });
-
-        const result = await response.json();
 
         document.getElementById('seedResult').innerHTML = `
           <div class="alert alert-success">

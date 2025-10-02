@@ -1,13 +1,21 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+require('dotenv').config();
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
+const BASE_PATH = process.env.BASE_PATH || ''; // Chemin de base configurable via variable d'environnement
 
 // Middleware
 app.use(express.json());
-app.use(express.static('public'));
+
+// Servir les fichiers statiques avec ou sans BASE_PATH
+if (BASE_PATH) {
+  app.use(BASE_PATH, express.static('public'));
+} else {
+  app.use(express.static('public'));
+}
 
 // Chemins des fichiers de données
 const QUESTIONS_FILE = path.join(__dirname, 'data', 'questions.json');
@@ -99,8 +107,13 @@ function calculateFamily(answers) {
 
 // === ROUTES API ===
 
+// Endpoint pour fournir la config au frontend
+app.get((BASE_PATH || '') + '/api/config', (req, res) => {
+  res.json({ basePath: BASE_PATH });
+});
+
 // GET /api/questions - Liste des questions
-app.get('/api/questions', (req, res) => {
+app.get((BASE_PATH || '') + '/api/questions', (req, res) => {
   const questions = readJSON(QUESTIONS_FILE);
   if (questions) {
     res.json(questions);
@@ -109,8 +122,8 @@ app.get('/api/questions', (req, res) => {
   }
 });
 
-// POST /api/submit - Soumettre les réponses
-app.post('/api/submit', (req, res) => {
+// POST /plante/api/submit - Soumettre les réponses
+app.post((BASE_PATH || '') + '/api/submit', (req, res) => {
   const { answers } = req.body;
 
   if (!answers || !Array.isArray(answers)) {
@@ -142,8 +155,8 @@ app.post('/api/submit', (req, res) => {
   });
 });
 
-// GET /api/plants/:family - Récupérer plantes d'une famille
-app.get('/api/plants/:family', (req, res) => {
+// GET /plante/api/plants/:family - Récupérer plantes d'une famille
+app.get((BASE_PATH || '') + '/api/plants/:family', (req, res) => {
   const plants = readJSON(PLANTS_FILE);
   const family = req.params.family;
 
@@ -154,8 +167,8 @@ app.get('/api/plants/:family', (req, res) => {
   }
 });
 
-// GET /api/stats/summary - Statistiques agrégées
-app.get('/api/stats/summary', (req, res) => {
+// GET /plante/api/stats/summary - Statistiques agrégées
+app.get((BASE_PATH || '') + '/api/stats/summary', (req, res) => {
   const results = readNDJSON(RESULTS_FILE);
 
   const summary = {
@@ -230,14 +243,14 @@ app.get('/api/stats/summary', (req, res) => {
 
 // === ROUTES ADMIN ===
 
-// GET /api/admin/questions - Récupérer questions pour édition
-app.get('/api/admin/questions', (req, res) => {
+// GET /plante/api/admin/questions - Récupérer questions pour édition
+app.get((BASE_PATH || '') + '/api/admin/questions', (req, res) => {
   const questions = readJSON(QUESTIONS_FILE);
   res.json(questions || []);
 });
 
-// PUT /api/admin/questions - Modifier questions
-app.put('/api/admin/questions', (req, res) => {
+// PUT /plante/api/admin/questions - Modifier questions
+app.put((BASE_PATH || '') + '/api/admin/questions', (req, res) => {
   const { questions } = req.body;
 
   if (!questions || !Array.isArray(questions)) {
@@ -251,14 +264,14 @@ app.put('/api/admin/questions', (req, res) => {
   }
 });
 
-// GET /api/admin/plants - Récupérer plantes pour édition
-app.get('/api/admin/plants', (req, res) => {
+// GET /plante/api/admin/plants - Récupérer plantes pour édition
+app.get((BASE_PATH || '') + '/api/admin/plants', (req, res) => {
   const plants = readJSON(PLANTS_FILE);
   res.json(plants || {});
 });
 
-// PUT /api/admin/plants - Modifier plantes
-app.put('/api/admin/plants', (req, res) => {
+// PUT /plante/api/admin/plants - Modifier plantes
+app.put((BASE_PATH || '') + '/api/admin/plants', (req, res) => {
   const { plants } = req.body;
 
   if (!plants || typeof plants !== 'object') {
@@ -272,8 +285,8 @@ app.put('/api/admin/plants', (req, res) => {
   }
 });
 
-// POST /api/admin/seed - Générer données simulées
-app.post('/api/admin/seed', (req, res) => {
+// POST /plante/api/admin/seed - Générer données simulées
+app.post((BASE_PATH || '') + '/api/admin/seed', (req, res) => {
   const { count = 50 } = req.body;
   const questions = readJSON(QUESTIONS_FILE);
   const families = ['Dépolluante', 'Grimpante', 'Exotique', 'Résistante'];
@@ -312,8 +325,8 @@ app.post('/api/admin/seed', (req, res) => {
   });
 });
 
-// GET /api/admin/export - Exporter résultats
-app.get('/api/admin/export', (req, res) => {
+// GET /plante/api/admin/export - Exporter résultats
+app.get((BASE_PATH || '') + '/api/admin/export', (req, res) => {
   const { format = 'csv' } = req.query;
   const results = readNDJSON(RESULTS_FILE);
 
