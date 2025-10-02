@@ -2,7 +2,7 @@
   "Dépolluante": [
     {
       "name": "Sansevieria (Langue de belle-mère)",
-      "image": "🌿",
+      "image": "images/plantes/sansevieria.jpg",
       "description": "Plante de bureau idéale qui purifie l'air 24h/24, même dans les espaces peu ventilés. Ultra-résistante aux conditions d'intérieur.",
       "care": {
         "arrosage": "1 fois toutes les 3 semaines",
@@ -14,7 +14,7 @@
     },
     {
       "name": "Pothos (Scindapsus doré)",
-      "image": "🍃",
+      "image": "images/plantes/pothos.jpg",
       "description": "Champion de la dépollution d'intérieur. Feuilles en forme de cœur, croissance rapide, parfaite en suspension ou étagère.",
       "care": {
         "arrosage": "1 fois par semaine",
@@ -26,7 +26,7 @@
     },
     {
       "name": "Spathiphyllum (Fleur de lune)",
-      "image": "🌱",
+      "image": "images/plantes/spathiphyllum.jpg",
       "description": "Élégantes fleurs blanches, reconnue par la NASA comme une des meilleures plantes dépolluantes d'intérieur.",
       "care": {
         "arrosage": "2 fois par semaine, terre humide",
@@ -40,7 +40,7 @@
   "Grimpante": [
     {
       "name": "Monstera Deliciosa",
-      "image": "🌴",
+      "image": "images/plantes/monstera.jpg",
       "description": "Star Instagram des bureaux modernes. Grandes feuilles perforées spectaculaires, parfaite pour espaces de réunion et open-spaces.",
       "care": {
         "arrosage": "1 fois par semaine, moins en hiver",
@@ -52,7 +52,7 @@
     },
     {
       "name": "Philodendron Scandens",
-      "image": "🌿",
+      "image": "images/plantes/philodendron.jpg",
       "description": "Plante grimpante ou retombante adaptable. Feuillage brillant dense, parfaite pour étagères hautes ou murs végétaux d'intérieur.",
       "care": {
         "arrosage": "Quand terreau sec en surface",
@@ -64,7 +64,7 @@
     },
     {
       "name": "Epipremnum (Lierre du diable)",
-      "image": "🍀",
+      "image": "images/plantes/epipremnum.jpg",
       "description": "Plante bureau par excellence. Retombante ou grimpante sur tuteur, feuillage panaché lumineux, quasi indestructible.",
       "care": {
         "arrosage": "1 fois par semaine",
@@ -78,7 +78,7 @@
   "Exotique": [
     {
       "name": "Orchidée Phalaenopsis",
-      "image": "🌸",
+      "image": "images/plantes/orchidee.jpg",
       "description": "Élégance zen pour bureaux de direction et espaces d'accueil. Floraison spectaculaire de 2-3 mois, ambiance raffinée.",
       "care": {
         "arrosage": "1 fois par semaine par trempage 15min",
@@ -90,7 +90,7 @@
     },
     {
       "name": "Ficus Ginseng (Bonsaï)",
-      "image": "🎋",
+      "image": "images/plantes/bonsai.jpg",
       "description": "Mini-arbre d'art vivant pour bureaux individuels. Tronc racinaire sculpté, symbolise longévité et sagesse.",
       "care": {
         "arrosage": "2-3 fois par semaine, terreau jamais sec",
@@ -102,7 +102,7 @@
     },
     {
       "name": "Anthurium",
-      "image": "🌺",
+      "image": "images/plantes/anthurium.jpg",
       "description": "Fleurs vernissées rouges/roses en forme de cœur. Tropical chic pour salles d'attente et espaces communs.",
       "care": {
         "arrosage": "2 fois par semaine, vaporiser feuilles",
@@ -116,7 +116,7 @@
   "Résistante": [
     {
       "name": "Cactus de bureau (assortiment)",
-      "image": "🌵",
+      "image": "images/plantes/cactus.jpg",
       "description": "Compagnons parfaits pour bureaux individuels. Variété de formes, demandent quasiment zéro entretien. Idéal voyageurs d'affaires.",
       "care": {
         "arrosage": "1 fois par mois (hiver: 0)",
@@ -128,7 +128,7 @@
     },
     {
       "name": "Zamioculcas (Plante ZZ)",
-      "image": "🌿",
+      "image": "images/plantes/zamioculcas.jpg",
       "description": "LA plante increvable des bureaux. Feuillage brillant architectural, survit aux vacances prolongées et éclairage artificiel.",
       "care": {
         "arrosage": "1 fois toutes les 3 semaines",
@@ -140,7 +140,7 @@
     },
     {
       "name": "Succulentes (Echeveria, Crassula)",
-      "image": "🌿",
+      "image": "images/plantes/succulentes.jpg",
       "description": "Mini plantes grasses décoratives pour petits espaces. Design moderne, collection possible, aucune exigence.",
       "care": {
         "arrosage": "1 fois toutes les 2 semaines",
