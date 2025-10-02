@@ -287,11 +287,15 @@
       result.plants.forEach(plant => {
         const col = document.createElement('div');
         col.className = 'col-md-6';
+        // Construire le chemin de l'image en tenant compte du BASE_PATH
+        const imagePath = plant.image.startsWith('http')
+          ? plant.image
+          : (APP_CONFIG.basePath ? `${APP_CONFIG.basePath}/${plant.image}` : plant.image);
         col.innerHTML = `
           <div class="card plant-card h-100 shadow-sm">
             <div class="card-body">
               <div class="text-center mb-3">
-                <img src="${plant.image}" alt="${plant.name}" class="img-fluid rounded" style="max-height: 200px; object-fit: cover; width: 100%;">
+                <img src="${imagePath}" alt="${plant.name}" class="img-fluid rounded" style="max-height: 200px; object-fit: cover; width: 100%;">
                 <h4 class="card-title mt-3">${plant.name}</h4>
               </div>
               <p class="card-text text-muted">${plant.description}</p>
