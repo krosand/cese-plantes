@@ -369,6 +369,25 @@ app.post((BASE_PATH || '') + '/api/admin/seed', (req, res) => {
   });
 });
 
+// DELETE /plante/api/admin/clear-all - Supprimer toutes les données
+app.delete((BASE_PATH || '') + '/api/admin/clear-all', (req, res) => {
+  try {
+    // Vider le fichier results.ndjson
+    fs.writeFileSync(RESULTS_FILE, '', 'utf8');
+
+    res.json({
+      success: true,
+      message: 'Toutes les données ont été supprimées avec succès'
+    });
+  } catch (err) {
+    console.error('Erreur lors de la suppression:', err);
+    res.status(500).json({
+      success: false,
+      error: 'Erreur lors de la suppression des données'
+    });
+  }
+});
+
 // GET /plante/api/admin/export - Exporter résultats
 app.get((BASE_PATH || '') + '/api/admin/export', (req, res) => {
   const { format = 'csv' } = req.query;

@@ -249,22 +249,46 @@
         <div id="seed" class="section">
           <h2 class="mb-4">🎲 Générer Données Simulées</h2>
 
-          <div class="card shadow-sm">
-            <div class="card-body">
-              <h5 class="card-title">Créer des réponses aléatoires</h5>
-              <p class="text-muted">
-                Générez des soumissions de test pour remplir vos statistiques.
-                Utile pour tester l'interface sans faire le quiz manuellement.
-              </p>
+          <div class="row g-4">
+            <div class="col-md-6">
+              <div class="card shadow-sm h-100">
+                <div class="card-body">
+                  <h5 class="card-title">Créer des réponses aléatoires</h5>
+                  <p class="text-muted">
+                    Générez des soumissions de test pour remplir vos statistiques.
+                    Utile pour tester l'interface sans faire le quiz manuellement.
+                  </p>
 
-              <div class="mb-3">
-                <label for="seedCount" class="form-label">Nombre de réponses à générer</label>
-                <input type="number" class="form-control" id="seedCount" value="50" min="1" max="1000">
+                  <div class="mb-3">
+                    <label for="seedCount" class="form-label">Nombre de réponses à générer</label>
+                    <input type="number" class="form-control" id="seedCount" value="50" min="1" max="1000">
+                  </div>
+
+                  <button class="btn btn-warning btn-lg w-100" id="generateSeedBtn">
+                    🎲 Générer les données
+                  </button>
+                </div>
               </div>
+            </div>
 
-              <button class="btn btn-warning btn-lg" id="generateSeedBtn">
-                🎲 Générer les données
-              </button>
+            <div class="col-md-6">
+              <div class="card shadow-sm h-100 border-danger">
+                <div class="card-body">
+                  <h5 class="card-title text-danger">Supprimer toutes les données simulées</h5>
+                  <p class="text-muted">
+                    Supprimez TOUTES les réponses enregistrées pour repartir de zéro.
+                    <strong>Attention : cette action est irréversible !</strong>
+                  </p>
+
+                  <div class="alert alert-warning">
+                    <small>⚠️ Cela effacera <strong>toutes les données</strong> du fichier results.ndjson</small>
+                  </div>
+
+                  <button class="btn btn-danger btn-lg w-100" id="clearAllDataBtn">
+                    🗑️ Tout supprimer
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -901,6 +925,54 @@
       } finally {
         btn.disabled = false;
         btn.textContent = '🎲 Générer les données';
+      }
+    });
+
+    // Supprimer toutes les données
+    document.getElementById('clearAllDataBtn').addEventListener('click', async () => {
+      const confirmation = confirm(
+        '⚠️ ATTENTION ⚠️\n\n' +
+        'Vous êtes sur le point de SUPPRIMER TOUTES les données enregistrées.\n\n' +
+        'Cela effacera définitivement :\n' +
+        '- Toutes les réponses au quiz\n' +
+        '- Toutes les statistiques\n' +
+        '- Toutes les données simulées\n\n' +
+        'Cette action est IRRÉVERSIBLE !\n\n' +
+        'Voulez-vous vraiment continuer ?'
+      );
+
+      if (!confirmation) return;
+
+      const doubleConfirmation = confirm(
+        'Dernière confirmation :\n\n' +
+        'Êtes-vous ABSOLUMENT SÛR de vouloir tout supprimer ?'
+      );
+
+      if (!doubleConfirmation) return;
+
+      const btn = document.getElementById('clearAllDataBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Suppression...';
+
+      try {
+        const result = await apiCall('/api/admin/clear-all', {
+          method: 'DELETE'
+        });
+
+        document.getElementById('seedResult').innerHTML = `
+          <div class="alert alert-success">
+            <strong>✅ ${result.message}</strong>
+            <p class="mb-0 mt-2">Toutes les données ont été supprimées. Les statistiques sont maintenant vides.</p>
+          </div>
+        `;
+
+        showSuccess(result.message);
+      } catch (err) {
+        alert('Erreur lors de la suppression : ' + err.message);
+        console.error(err);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🗑️ Tout supprimer';
       }
     });
 
