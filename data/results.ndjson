@@ -51,3 +51,17 @@
 {"timestamp":"2025-09-30T22:06:26.602Z","answers":[0,0,2,2,2,0,0,0],"family":"Résistante","scores":{"Dépolluante":11,"Grimpante":7,"Exotique":9,"Résistante":16},"completed":true}
 {"timestamp":"2025-09-06T22:06:26.602Z","answers":[2,1,2,1,0,1,1,1],"family":"Dépolluante","scores":{"Dépolluante":14,"Grimpante":11,"Exotique":14,"Résistante":9},"completed":true}
 {"timestamp":"2025-10-02T22:07:41.098Z","answers":[1,2,0,1,1,1,2,1],"family":"Grimpante","scores":{"Dépolluante":12,"Grimpante":17,"Exotique":15,"Résistante":6},"completed":true}
+{"timestamp":"2025-10-03T00:10:02.192Z","answers":[1,2,0,1,1,1,2,1],"family":"Grimpante","scores":{"Dépolluante":12,"Grimpante":17,"Exotique":15,"Résistante":6},"completed":true}
+{"timestamp":"2025-10-03T00:10:27.096Z","answers":[0,0,0,0,0,0,0,0],"family":"Dépolluante","scores":{"Dépolluante":19,"Grimpante":4,"Exotique":2,"Résistante":18},"completed":true}
+{"timestamp":"2025-10-03T00:17:19.010Z","answers":[0,0,0,0,3,1,2,2],"family":"Résistante","scores":{"Dépolluante":13,"Grimpante":9,"Exotique":9,"Résistante":14},"completed":true}
+{"timestamp":"2025-10-03T00:42:23.103Z","answers":[0,0,0,0,3,1,2,2],"family":"Résistante","scores":{"Dépolluante":13,"Grimpante":9,"Exotique":9,"Résistante":14},"completed":true}
+{"timestamp":"2025-10-03T00:51:12.207Z","answers":[0,0,0,0,3,1,2,2],"family":"Résistante","scores":{"Dépolluante":13,"Grimpante":9,"Exotique":9,"Résistante":14},"completed":true}
+{"timestamp":"2025-10-03T00:51:32.658Z","answers":[0,0,0,0,3,1,2,2],"family":"Résistante","scores":{"Dépolluante":13,"Grimpante":9,"Exotique":9,"Résistante":14},"completed":true}
+{"timestamp":"2025-10-03T00:59:06.919Z","answers":[0,0,0,0,3,1,2,2],"family":"Résistante","scores":{"Dépolluante":13,"Grimpante":9,"Exotique":9,"Résistante":14},"completed":true}
+{"timestamp":"2025-10-03T01:08:08.307Z","answers":[0,0,0,0,3,1,2,2],"family":"Résistante","scores":{"Dépolluante":13,"Grimpante":9,"Exotique":9,"Résistante":14},"completed":true}
+{"timestamp":"2025-10-03T06:08:33.437Z","answers":[0,0,0,0,3,1,2,2],"family":"Résistante","scores":{"Dépolluante":13,"Grimpante":9,"Exotique":9,"Résistante":14},"completed":true}
+{"timestamp":"2025-10-03T06:09:18.735Z","answers":[1,0,2,2,2,2,2,2],"family":"Exotique","scores":{"Dépolluante":6,"Grimpante":15,"Exotique":19,"Résistante":5},"completed":true}
+{"timestamp":"2025-10-03T06:42:49.152Z","answers":[1,1,1,2,0,2,1,2],"family":"Grimpante","scores":{"Dépolluante":13,"Grimpante":17,"Exotique":13,"Résistante":4},"completed":true}
+{"timestamp":"2025-10-03T06:47:50.688Z","answers":[0,1,0,1,1,0,1,0],"family":"Dépolluante","scores":{"Dépolluante":17,"Grimpante":10,"Exotique":6,"Résistante":15},"completed":true}
+{"timestamp":"2025-10-03T06:50:38.430Z","answers":[0,1,0,1,1,0,1,0],"family":"Dépolluante","scores":{"Dépolluante":17,"Grimpante":10,"Exotique":6,"Résistante":15},"completed":true}
+{"timestamp":"2025-10-03T06:51:59.257Z","answers":[0,1,0,1,1,0,1,0],"family":"Dépolluante","scores":{"Dépolluante":17,"Grimpante":10,"Exotique":6,"Résistante":15},"completed":true}
