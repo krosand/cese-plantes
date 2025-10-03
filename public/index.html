@@ -15,7 +15,7 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     .container {
-      max-width: 800px;
+      max-width: 1200px;
     }
     .question-card {
       transition: all 0.3s ease;
@@ -288,7 +288,7 @@
 
       result.plants.forEach(plant => {
         const col = document.createElement('div');
-        col.className = 'col-md-6';
+        col.className = 'col-md-4';
         // Construire le chemin de l'image en tenant compte du BASE_PATH
         const imagePath = plant.image.startsWith('http')
           ? plant.image
