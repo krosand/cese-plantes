@@ -160,14 +160,35 @@
         <div id="questions" class="section">
           <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>❓ Gestion des Questions</h2>
-            <button class="btn btn-success" id="saveQuestionsBtn">💾 Sauvegarder</button>
+            <div>
+              <button class="btn btn-outline-secondary me-2" id="toggleQuestionViewBtn">
+                <span id="questionViewModeIcon">📝</span> <span id="questionViewModeText">Mode JSON</span>
+              </button>
+              <button class="btn btn-success" id="saveQuestionsBtn">💾 Sauvegarder</button>
+            </div>
           </div>
 
-          <div class="alert alert-info">
-            <strong>ℹ️ Format JSON :</strong> Modifiez le JSON ci-dessous. Assurez-vous que la syntaxe est valide avant de sauvegarder.
+          <!-- Interface conviviale (par défaut) -->
+          <div id="questionsFriendlyView">
+            <div class="alert alert-success">
+              <strong>✨ Interface simple :</strong> Modifiez les questions et réponses facilement. Pas besoin de connaître le JSON !
+            </div>
+
+            <!-- Liste des questions -->
+            <div id="questionsListContainer"></div>
+
+            <button class="btn btn-outline-primary mt-3" id="addQuestionBtn">
+              ➕ Ajouter une question
+            </button>
           </div>
 
-          <textarea id="questionsEditor" class="form-control json-editor"></textarea>
+          <!-- Vue JSON (cachée par défaut) -->
+          <div id="questionsJsonView" style="display: none;">
+            <div class="alert alert-warning">
+              <strong>⚠️ Mode expert :</strong> Modifiez le JSON directement. Attention à la syntaxe !
+            </div>
+            <textarea id="questionsEditor" class="form-control json-editor"></textarea>
+          </div>
 
           <div class="mt-3">
             <button class="btn btn-outline-secondary" id="resetQuestionsBtn">🔄 Annuler modifications</button>
@@ -337,22 +358,220 @@
       }, 3000);
     }
 
+    // Variables pour mode questions
+    let questionViewMode = 'friendly'; // ou 'json'
+
     // Charger questions
     async function loadQuestions() {
       try {
         questionsData = await apiCall('/api/admin/questions');
         document.getElementById('questionsEditor').value = JSON.stringify(questionsData, null, 2);
         document.getElementById('questionsCount').textContent = questionsData.length + ' questions';
+
+        // Charger la vue conviviale
+        renderQuestionsList();
       } catch (err) {
         console.error('Erreur chargement questions:', err);
       }
     }
 
+    // Rendre la liste des questions en mode convivial
+    function renderQuestionsList() {
+      const container = document.getElementById('questionsListContainer');
+      container.innerHTML = '';
+
+      questionsData.forEach((question, qIdx) => {
+        const card = document.createElement('div');
+        card.className = 'card mb-4';
+        card.innerHTML = `
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="card-title mb-0">Question ${qIdx + 1}</h5>
+              <button class="btn btn-sm btn-outline-danger" onclick="deleteQuestion(${qIdx})">🗑️ Supprimer</button>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">Texte de la question</label>
+              <input type="text" class="form-control" value="${question.text}"
+                     onchange="updateQuestionText(${qIdx}, this.value)">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">Réponses (choix)</label>
+              <div id="choices-${qIdx}">
+                ${question.choices.map((choice, cIdx) => `
+                  <div class="card mb-2">
+                    <div class="card-body">
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                        <strong>Choix ${cIdx + 1}</strong>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteChoice(${qIdx}, ${cIdx})">🗑️</button>
+                      </div>
+
+                      <div class="mb-2">
+                        <label class="form-label">Texte du choix</label>
+                        <input type="text" class="form-control" value="${choice.label}"
+                               onchange="updateChoiceLabel(${qIdx}, ${cIdx}, this.value)">
+                      </div>
+
+                      <div class="row g-2">
+                        <div class="col-6">
+                          <label class="form-label">🌿 Dépolluante</label>
+                          <input type="number" class="form-control" value="${choice.scores['Dépolluante']}"
+                                 onchange="updateChoiceScore(${qIdx}, ${cIdx}, 'Dépolluante', parseInt(this.value))">
+                        </div>
+                        <div class="col-6">
+                          <label class="form-label">🌴 Grimpante</label>
+                          <input type="number" class="form-control" value="${choice.scores['Grimpante']}"
+                                 onchange="updateChoiceScore(${qIdx}, ${cIdx}, 'Grimpante', parseInt(this.value))">
+                        </div>
+                        <div class="col-6">
+                          <label class="form-label">🌸 Exotique</label>
+                          <input type="number" class="form-control" value="${choice.scores['Exotique']}"
+                                 onchange="updateChoiceScore(${qIdx}, ${cIdx}, 'Exotique', parseInt(this.value))">
+                        </div>
+                        <div class="col-6">
+                          <label class="form-label">🌵 Résistante</label>
+                          <input type="number" class="form-control" value="${choice.scores['Résistante']}"
+                                 onchange="updateChoiceScore(${qIdx}, ${cIdx}, 'Résistante', parseInt(this.value))">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+              <button class="btn btn-sm btn-outline-primary mt-2" onclick="addChoice(${qIdx})">
+                ➕ Ajouter un choix
+              </button>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Mettre à jour le texte d'une question
+    function updateQuestionText(qIdx, value) {
+      questionsData[qIdx].text = value;
+      syncQuestionsJsonEditor();
+    }
+
+    // Mettre à jour le label d'un choix
+    function updateChoiceLabel(qIdx, cIdx, value) {
+      questionsData[qIdx].choices[cIdx].label = value;
+      syncQuestionsJsonEditor();
+    }
+
+    // Mettre à jour le score d'un choix
+    function updateChoiceScore(qIdx, cIdx, family, value) {
+      questionsData[qIdx].choices[cIdx].scores[family] = value;
+      syncQuestionsJsonEditor();
+    }
+
+    // Supprimer une question
+    function deleteQuestion(qIdx) {
+      if (confirm('Êtes-vous sûr de vouloir supprimer cette question ?')) {
+        questionsData.splice(qIdx, 1);
+        renderQuestionsList();
+        syncQuestionsJsonEditor();
+      }
+    }
+
+    // Supprimer un choix
+    function deleteChoice(qIdx, cIdx) {
+      if (questionsData[qIdx].choices.length <= 2) {
+        alert('Une question doit avoir au moins 2 choix');
+        return;
+      }
+      if (confirm('Êtes-vous sûr de vouloir supprimer ce choix ?')) {
+        questionsData[qIdx].choices.splice(cIdx, 1);
+        renderQuestionsList();
+        syncQuestionsJsonEditor();
+      }
+    }
+
+    // Ajouter un choix à une question
+    function addChoice(qIdx) {
+      const newChoice = {
+        label: "Nouveau choix",
+        scores: {
+          "Dépolluante": 0,
+          "Grimpante": 0,
+          "Exotique": 0,
+          "Résistante": 0
+        }
+      };
+      questionsData[qIdx].choices.push(newChoice);
+      renderQuestionsList();
+      syncQuestionsJsonEditor();
+    }
+
+    // Ajouter une question
+    document.getElementById('addQuestionBtn').addEventListener('click', () => {
+      const newQuestion = {
+        id: questionsData.length + 1,
+        text: "Nouvelle question",
+        choices: [
+          {
+            label: "Choix 1",
+            scores: { "Dépolluante": 3, "Grimpante": 1, "Exotique": 0, "Résistante": 2 }
+          },
+          {
+            label: "Choix 2",
+            scores: { "Dépolluante": 0, "Grimpante": 3, "Exotique": 2, "Résistante": 1 }
+          }
+        ]
+      };
+      questionsData.push(newQuestion);
+      renderQuestionsList();
+      syncQuestionsJsonEditor();
+    });
+
+    // Synchroniser l'éditeur JSON questions
+    function syncQuestionsJsonEditor() {
+      document.getElementById('questionsEditor').value = JSON.stringify(questionsData, null, 2);
+    }
+
+    // Basculer entre mode convivial et JSON pour questions
+    document.getElementById('toggleQuestionViewBtn').addEventListener('click', () => {
+      const friendlyView = document.getElementById('questionsFriendlyView');
+      const jsonView = document.getElementById('questionsJsonView');
+      const icon = document.getElementById('questionViewModeIcon');
+      const text = document.getElementById('questionViewModeText');
+
+      if (questionViewMode === 'friendly') {
+        questionViewMode = 'json';
+        friendlyView.style.display = 'none';
+        jsonView.style.display = 'block';
+        icon.textContent = '📝';
+        text.textContent = 'Mode Simple';
+      } else {
+        questionViewMode = 'friendly';
+        try {
+          questionsData = JSON.parse(document.getElementById('questionsEditor').value);
+          renderQuestionsList();
+        } catch (e) {
+          alert('Erreur JSON, impossible de basculer');
+          return;
+        }
+        friendlyView.style.display = 'block';
+        jsonView.style.display = 'none';
+        icon.textContent = '🔧';
+        text.textContent = 'Mode JSON';
+      }
+    });
+
     // Sauvegarder questions
     document.getElementById('saveQuestionsBtn').addEventListener('click', async () => {
       try {
-        const content = document.getElementById('questionsEditor').value;
-        const questions = JSON.parse(content);
+        // Si en mode convivial, on utilise questionsData directement
+        // Si en mode JSON, on parse l'éditeur
+        let questions;
+        if (questionViewMode === 'friendly') {
+          questions = questionsData;
+        } else {
+          const content = document.getElementById('questionsEditor').value;
+          questions = JSON.parse(content);
+        }
 
         const result = await apiCall('/api/admin/questions', {
           method: 'PUT',
@@ -371,7 +590,11 @@
 
     // Reset questions
     document.getElementById('resetQuestionsBtn').addEventListener('click', () => {
-      document.getElementById('questionsEditor').value = JSON.stringify(questionsData, null, 2);
+      if (questionViewMode === 'friendly') {
+        loadQuestions(); // Recharger depuis le serveur
+      } else {
+        document.getElementById('questionsEditor').value = JSON.stringify(questionsData, null, 2);
+      }
     });
 
     // Variables pour mode plantes
