@@ -86,7 +86,7 @@
     </div>
 
     <!-- Introduction démarche -->
-    <div class="card mb-5 shadow-sm border-0" style="background: linear-gradient(135deg, #f5fff5 0%, #e8f5e9 100%);">
+    <div id="introSection" class="card mb-5 shadow-sm border-0" style="background: linear-gradient(135deg, #f5fff5 0%, #e8f5e9 100%);">
       <div class="card-body p-4">
         <h3 class="text-success mb-3">🌱 Notre démarche</h3>
         <p class="mb-3">
@@ -335,10 +335,11 @@
 
     // Afficher résultat
     function displayResult(result) {
-      // Masquer questions et bouton
+      // Masquer questions, bouton et introduction
       document.getElementById('questionsContainer').style.display = 'none';
       document.getElementById('submitContainer').style.display = 'none';
       document.getElementById('progressBar').style.display = 'none';
+      document.getElementById('introSection').style.display = 'none';
 
       // Afficher résultat
       document.getElementById('familyBadge').textContent = result.family;
@@ -398,6 +399,7 @@
 
       document.getElementById('resultContainer').style.display = 'none';
       document.getElementById('questionsContainer').style.display = 'block';
+      document.getElementById('introSection').style.display = 'block';
 
       renderQuestions();
       updateProgress();
