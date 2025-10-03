@@ -65,3 +65,12 @@
 {"timestamp":"2025-10-03T06:47:50.688Z","answers":[0,1,0,1,1,0,1,0],"family":"Dépolluante","scores":{"Dépolluante":17,"Grimpante":10,"Exotique":6,"Résistante":15},"completed":true}
 {"timestamp":"2025-10-03T06:50:38.430Z","answers":[0,1,0,1,1,0,1,0],"family":"Dépolluante","scores":{"Dépolluante":17,"Grimpante":10,"Exotique":6,"Résistante":15},"completed":true}
 {"timestamp":"2025-10-03T06:51:59.257Z","answers":[0,1,0,1,1,0,1,0],"family":"Dépolluante","scores":{"Dépolluante":17,"Grimpante":10,"Exotique":6,"Résistante":15},"completed":true}
+{"timestamp":"2025-10-03T06:55:59.201Z","answers":[0,1,0,1,1,0,1,0],"family":"Dépolluante","scores":{"Dépolluante":17,"Grimpante":10,"Exotique":6,"Résistante":15},"completed":true}
+{"timestamp":"2025-10-03T06:56:19.749Z","answers":[0,1,0,1,1,0,1,0],"family":"Dépolluante","scores":{"Dépolluante":17,"Grimpante":10,"Exotique":6,"Résistante":15},"completed":true}
+{"timestamp":"2025-10-03T06:57:01.871Z","answers":[0,1,0,1,1,0,1,0],"family":"Dépolluante","scores":{"Dépolluante":17,"Grimpante":10,"Exotique":6,"Résistante":15},"completed":true}
+{"timestamp":"2025-10-03T07:21:50.832Z","answers":[0,1,0,1,1,0,1,0],"family":"Dépolluante","scores":{"Dépolluante":17,"Grimpante":10,"Exotique":6,"Résistante":15},"completed":true}
+{"timestamp":"2025-10-03T07:22:41.777Z","answers":[0,0,0,0,0,0,0,0],"family":"Dépolluante","scores":{"Dépolluante":19,"Grimpante":4,"Exotique":2,"Résistante":18},"completed":true}
+{"timestamp":"2025-10-03T07:23:23.609Z","answers":[1,1,1,1,2,1,1,1],"family":"Grimpante","scores":{"Dépolluante":12,"Grimpante":15,"Exotique":14,"Résistante":7},"completed":true}
+{"timestamp":"2025-10-03T07:37:59.013Z","answers":[2,0,2,2,3,2,2,2],"family":"Exotique","scores":{"Dépolluante":8,"Grimpante":11,"Exotique":17,"Résistante":9},"completed":true}
+{"timestamp":"2025-10-03T07:49:08.993Z","answers":[2,0,2,2,3,2,2,2],"family":"Exotique","scores":{"Dépolluante":8,"Grimpante":11,"Exotique":17,"Résistante":9},"completed":true}
+{"timestamp":"2025-10-03T07:50:38.871Z","answers":[2,0,2,2,3,2,2,2],"family":"Exotique","scores":{"Dépolluante":8,"Grimpante":11,"Exotique":17,"Résistante":9},"completed":true}

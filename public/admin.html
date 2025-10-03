@@ -178,14 +178,46 @@
         <div id="plants" class="section">
           <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>🌿 Gestion des Plantes</h2>
-            <button class="btn btn-success" id="savePlantsBtn">💾 Sauvegarder</button>
+            <div>
+              <button class="btn btn-outline-secondary me-2" id="togglePlantViewBtn">
+                <span id="viewModeIcon">📝</span> <span id="viewModeText">Mode JSON</span>
+              </button>
+              <button class="btn btn-success" id="savePlantsBtn">💾 Sauvegarder</button>
+            </div>
           </div>
 
-          <div class="alert alert-info">
-            <strong>ℹ️ Format JSON :</strong> Modifiez les fiches plantes par famille. Respectez la structure existante.
+          <!-- Interface conviviale (par défaut) -->
+          <div id="plantsFriendlyView">
+            <div class="alert alert-success">
+              <strong>✨ Interface simple :</strong> Modifiez les plantes en remplissant les champs ci-dessous. Pas besoin de connaître le JSON !
+            </div>
+
+            <!-- Sélecteur de famille -->
+            <div class="mb-4">
+              <label class="form-label fw-bold">Famille de plantes :</label>
+              <select class="form-select" id="plantFamilySelect">
+                <option value="Dépolluante">🌿 Dépolluante</option>
+                <option value="Grimpante">🌴 Grimpante</option>
+                <option value="Exotique">🌸 Exotique</option>
+                <option value="Résistante">🌵 Résistante</option>
+              </select>
+            </div>
+
+            <!-- Liste des plantes de la famille sélectionnée -->
+            <div id="plantsListContainer"></div>
+
+            <button class="btn btn-outline-primary mt-3" id="addPlantBtn">
+              ➕ Ajouter une plante à cette famille
+            </button>
           </div>
 
-          <textarea id="plantsEditor" class="form-control json-editor"></textarea>
+          <!-- Vue JSON (cachée par défaut) -->
+          <div id="plantsJsonView" style="display: none;">
+            <div class="alert alert-warning">
+              <strong>⚠️ Mode expert :</strong> Modifiez le JSON directement. Attention à la syntaxe !
+            </div>
+            <textarea id="plantsEditor" class="form-control json-editor"></textarea>
+          </div>
 
           <div class="mt-3">
             <button class="btn btn-outline-secondary" id="resetPlantsBtn">🔄 Annuler modifications</button>
@@ -342,6 +374,10 @@
       document.getElementById('questionsEditor').value = JSON.stringify(questionsData, null, 2);
     });
 
+    // Variables pour mode plantes
+    let plantViewMode = 'friendly'; // ou 'json'
+    let currentFamily = 'Dépolluante';
+
     // Charger plantes
     async function loadPlants() {
       try {
@@ -350,16 +386,239 @@
 
         const total = Object.values(plantsData).reduce((sum, arr) => sum + arr.length, 0);
         document.getElementById('plantsCount').textContent = total + ' plantes';
+
+        // Charger la vue conviviale
+        renderPlantsList();
       } catch (err) {
         console.error('Erreur chargement plantes:', err);
+      }
+    }
+
+    // Rendre la liste des plantes en mode convivial
+    function renderPlantsList() {
+      const container = document.getElementById('plantsListContainer');
+      const family = document.getElementById('plantFamilySelect').value;
+      const plants = plantsData[family] || [];
+
+      container.innerHTML = '';
+
+      plants.forEach((plant, index) => {
+        const card = document.createElement('div');
+        card.className = 'card mb-3';
+        card.innerHTML = `
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="card-title mb-0">Plante ${index + 1}</h5>
+              <button class="btn btn-sm btn-outline-danger" onclick="deletePlant(${index})">🗑️ Supprimer</button>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Nom de la plante</label>
+                <input type="text" class="form-control" value="${plant.name}"
+                       onchange="updatePlantField('${family}', ${index}, 'name', this.value)">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Image de la plante</label>
+                <div class="input-group">
+                  <input type="text" class="form-control" value="${plant.image}" id="imagePath-${family}-${index}"
+                         onchange="updatePlantField('${family}', ${index}, 'image', this.value)">
+                  <button class="btn btn-outline-secondary" type="button" onclick="document.getElementById('imageUpload-${family}-${index}').click()">
+                    📁 Parcourir
+                  </button>
+                  <input type="file" id="imageUpload-${family}-${index}" accept="image/png,image/jpeg,image/jpg"
+                         style="display:none" onchange="uploadPlantImage('${family}', ${index}, this)">
+                </div>
+                <small class="text-muted">Ou saisissez le chemin manuellement</small>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Description</label>
+                <textarea class="form-control" rows="2"
+                          onchange="updatePlantField('${family}', ${index}, 'description', this.value)">${plant.description}</textarea>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">💧 Arrosage</label>
+                <input type="text" class="form-control" value="${plant.care.arrosage}"
+                       onchange="updatePlantCare('${family}', ${index}, 'arrosage', this.value)">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">☀️ Lumière</label>
+                <input type="text" class="form-control" value="${plant.care.lumiere}"
+                       onchange="updatePlantCare('${family}', ${index}, 'lumiere', this.value)">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">🌡️ Température</label>
+                <input type="text" class="form-control" value="${plant.care.temperature}"
+                       onchange="updatePlantCare('${family}', ${index}, 'temperature', this.value)">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">📊 Difficulté</label>
+                <input type="text" class="form-control" value="${plant.care.difficulte}"
+                       onchange="updatePlantCare('${family}', ${index}, 'difficulte', this.value)">
+              </div>
+              <div class="col-12">
+                <label class="form-label">✨ Avantages</label>
+                <textarea class="form-control" rows="2"
+                          onchange="updatePlantField('${family}', ${index}, 'benefits', this.value)">${plant.benefits}</textarea>
+              </div>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Mettre à jour un champ de plante
+    function updatePlantField(family, index, field, value) {
+      plantsData[family][index][field] = value;
+      syncJsonEditor();
+    }
+
+    // Mettre à jour le soin d'une plante
+    function updatePlantCare(family, index, field, value) {
+      plantsData[family][index].care[field] = value;
+      syncJsonEditor();
+    }
+
+    // Supprimer une plante
+    function deletePlant(index) {
+      const family = document.getElementById('plantFamilySelect').value;
+      if (confirm(`Êtes-vous sûr de vouloir supprimer cette plante ?`)) {
+        plantsData[family].splice(index, 1);
+        renderPlantsList();
+        syncJsonEditor();
+      }
+    }
+
+    // Ajouter une plante
+    document.getElementById('addPlantBtn').addEventListener('click', () => {
+      const family = document.getElementById('plantFamilySelect').value;
+      const newPlant = {
+        name: "Nouvelle plante",
+        image: "images/plantes/nouvelle.png",
+        description: "Description de la plante",
+        care: {
+          arrosage: "1 fois par semaine",
+          lumiere: "Lumière indirecte",
+          temperature: "18-25°C",
+          difficulte: "Facile"
+        },
+        benefits: "Avantages de cette plante"
+      };
+      plantsData[family].push(newPlant);
+      renderPlantsList();
+      syncJsonEditor();
+    });
+
+    // Synchroniser l'éditeur JSON
+    function syncJsonEditor() {
+      document.getElementById('plantsEditor').value = JSON.stringify(plantsData, null, 2);
+    }
+
+    // Basculer entre mode convivial et JSON
+    document.getElementById('togglePlantViewBtn').addEventListener('click', () => {
+      const friendlyView = document.getElementById('plantsFriendlyView');
+      const jsonView = document.getElementById('plantsJsonView');
+      const icon = document.getElementById('viewModeIcon');
+      const text = document.getElementById('viewModeText');
+
+      if (plantViewMode === 'friendly') {
+        // Basculer vers JSON
+        plantViewMode = 'json';
+        friendlyView.style.display = 'none';
+        jsonView.style.display = 'block';
+        icon.textContent = '📝';
+        text.textContent = 'Mode Simple';
+      } else {
+        // Basculer vers convivial
+        plantViewMode = 'friendly';
+        // Recharger depuis JSON (au cas où modifié)
+        try {
+          plantsData = JSON.parse(document.getElementById('plantsEditor').value);
+          renderPlantsList();
+        } catch (e) {
+          alert('Erreur JSON, impossible de basculer');
+          return;
+        }
+        friendlyView.style.display = 'block';
+        jsonView.style.display = 'none';
+        icon.textContent = '🔧';
+        text.textContent = 'Mode JSON';
+      }
+    });
+
+    // Changement de famille
+    document.getElementById('plantFamilySelect').addEventListener('change', () => {
+      renderPlantsList();
+    });
+
+    // Upload d'image pour une plante
+    async function uploadPlantImage(family, index, input) {
+      const file = input.files[0];
+      if (!file) return;
+
+      // Vérifier le type de fichier
+      if (!file.type.match('image/(png|jpeg|jpg)')) {
+        alert('Seuls les fichiers PNG et JPG sont acceptés');
+        return;
+      }
+
+      // Vérifier la taille (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('La taille du fichier ne doit pas dépasser 5MB');
+        return;
+      }
+
+      try {
+        // Créer FormData pour l'upload
+        const formData = new FormData();
+        formData.append('image', file);
+
+        // Générer un nom de fichier basé sur le nom de la plante (slug)
+        const plantName = plantsData[family][index].name.toLowerCase()
+          .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Enlever accents
+          .replace(/[^a-z0-9]+/g, '-') // Remplacer caractères spéciaux par -
+          .replace(/^-+|-+$/g, ''); // Enlever - au début/fin
+
+        const extension = file.name.split('.').pop();
+        const newFileName = `${plantName}.${extension}`;
+
+        // Upload via API (à créer côté serveur)
+        const response = await fetch(APP_CONFIG.apiUrl('/api/admin/upload-image'), {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error('Erreur lors de l\'upload');
+        }
+
+        const result = await response.json();
+
+        // Mettre à jour le chemin de l'image
+        const imagePath = `images/plantes/${newFileName}`;
+        plantsData[family][index].image = imagePath;
+        document.getElementById(`imagePath-${family}-${index}`).value = imagePath;
+        syncJsonEditor();
+
+        showSuccess('Image uploadée avec succès');
+      } catch (err) {
+        alert('Erreur lors de l\'upload de l\'image : ' + err.message);
       }
     }
 
     // Sauvegarder plantes
     document.getElementById('savePlantsBtn').addEventListener('click', async () => {
       try {
-        const content = document.getElementById('plantsEditor').value;
-        const plants = JSON.parse(content);
+        // Si en mode convivial, on utilise plantsData directement
+        // Si en mode JSON, on parse l'éditeur
+        let plants;
+        if (plantViewMode === 'friendly') {
+          plants = plantsData;
+        } else {
+          const content = document.getElementById('plantsEditor').value;
+          plants = JSON.parse(content);
+        }
 
         const result = await apiCall('/api/admin/plants', {
           method: 'PUT',
@@ -378,7 +637,11 @@
 
     // Reset plantes
     document.getElementById('resetPlantsBtn').addEventListener('click', () => {
-      document.getElementById('plantsEditor').value = JSON.stringify(plantsData, null, 2);
+      if (plantViewMode === 'friendly') {
+        loadPlants(); // Recharger depuis le serveur
+      } else {
+        document.getElementById('plantsEditor').value = JSON.stringify(plantsData, null, 2);
+      }
     });
 
     // Générer données

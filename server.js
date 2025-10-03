@@ -1,11 +1,38 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const multer = require('multer');
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 const BASE_PATH = process.env.BASE_PATH || ''; // Chemin de base configurable via variable d'environnement
+
+// Configuration multer pour upload d'images
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = path.join(__dirname, 'public', 'images', 'plantes');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  }
+});
+
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Seules les images sont acceptées'));
+    }
+  }
+});
 
 // Middleware
 app.use(express.json());
@@ -282,6 +309,23 @@ app.put((BASE_PATH || '') + '/api/admin/plants', (req, res) => {
     res.json({ success: true, message: 'Plantes mises à jour' });
   } else {
     res.status(500).json({ error: 'Erreur lors de la sauvegarde' });
+  }
+});
+
+// POST /plante/api/admin/upload-image - Upload image de plante
+app.post((BASE_PATH || '') + '/api/admin/upload-image', upload.single('image'), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'Aucune image fournie' });
+    }
+
+    res.json({
+      success: true,
+      filename: req.file.filename,
+      path: `images/plantes/${req.file.filename}`
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur lors de l\'upload: ' + err.message });
   }
 });
 
