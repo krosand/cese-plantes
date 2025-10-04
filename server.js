@@ -151,10 +151,14 @@ app.get((BASE_PATH || '') + '/api/questions', (req, res) => {
 
 // POST /plante/api/submit - Soumettre les réponses
 app.post((BASE_PATH || '') + '/api/submit', (req, res) => {
-  const { answers } = req.body;
+  const { answers, user } = req.body;
 
   if (!answers || !Array.isArray(answers)) {
     return res.status(400).json({ error: 'Format de réponses invalide' });
+  }
+
+  if (!user || !user.firstName || !user.lastName) {
+    return res.status(400).json({ error: 'Nom et prénom requis' });
   }
 
   // Calculer la famille recommandée
@@ -167,6 +171,10 @@ app.post((BASE_PATH || '') + '/api/submit', (req, res) => {
   // Enregistrer le résultat
   const result = {
     timestamp: new Date().toISOString(),
+    user: {
+      firstName: user.firstName,
+      lastName: user.lastName
+    },
     answers,
     family,
     scores,
@@ -266,6 +274,70 @@ app.get((BASE_PATH || '') + '/api/stats/summary', (req, res) => {
   summary.topFamily = topFamily;
 
   res.json(summary);
+});
+
+// GET /plante/api/stats/adoptions - Liste des adoptions avec utilisateurs
+app.get((BASE_PATH || '') + '/api/stats/adoptions', (req, res) => {
+  const results = readNDJSON(RESULTS_FILE);
+
+  const adoptions = results
+    .filter(r => r.user && r.family)
+    .map(r => ({
+      timestamp: r.timestamp,
+      firstName: r.user.firstName,
+      lastName: r.user.lastName,
+      family: r.family,
+      plantName: r.plantName || null
+    }))
+    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+  res.json(adoptions);
+});
+
+// POST /plante/api/adopt - Enregistrer le choix de plante
+app.post((BASE_PATH || '') + '/api/adopt', (req, res) => {
+  const { user, plantName } = req.body;
+
+  if (!user || !user.firstName || !user.lastName) {
+    return res.status(400).json({ error: 'Utilisateur requis' });
+  }
+
+  if (!plantName) {
+    return res.status(400).json({ error: 'Nom de plante requis' });
+  }
+
+  // Lire tous les résultats
+  const results = readNDJSON(RESULTS_FILE);
+
+  // Trouver le dernier résultat de cet utilisateur
+  const userResults = results.filter(r =>
+    r.user &&
+    r.user.firstName === user.firstName &&
+    r.user.lastName === user.lastName
+  );
+
+  if (userResults.length === 0) {
+    return res.status(404).json({ error: 'Aucun résultat trouvé pour cet utilisateur' });
+  }
+
+  // Mettre à jour le dernier résultat avec la plante choisie
+  const lastResult = userResults[userResults.length - 1];
+  lastResult.plantName = plantName;
+  lastResult.adoptionTimestamp = new Date().toISOString();
+
+  // Réécrire le fichier NDJSON
+  try {
+    const content = results.map(r => JSON.stringify(r)).join('\n') + '\n';
+    fs.writeFileSync(RESULTS_FILE, content, 'utf8');
+
+    res.json({
+      success: true,
+      message: `Plante "${plantName}" adoptée avec succès !`
+    });
+  } catch (err) {
+    console.error('Erreur lors de la sauvegarde:', err);
+    res.status(500).json({ error: 'Erreur lors de la sauvegarde' });
+  }
 });
 
 // === ROUTES ADMIN ===

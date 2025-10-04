@@ -85,8 +85,39 @@
       <p class="lead text-secondary">Trouvez la plante parfaite pour vous en quelques questions</p>
     </div>
 
+    <!-- Formulaire identité -->
+    <div id="userFormSection" class="card mb-5 shadow-sm border-0" style="background: linear-gradient(135deg, #f5fff5 0%, #e8f5e9 100%);">
+      <div class="card-body p-4">
+        <h3 class="text-success mb-3">👤 Pour commencer...</h3>
+        <p class="mb-4">Merci de renseigner vos nom et prénom afin de personnaliser votre expérience.</p>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="userFirstName" class="form-label fw-bold">Prénom <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="userFirstName" placeholder="Votre prénom" required>
+          </div>
+          <div class="col-md-6">
+            <label for="userLastName" class="form-label fw-bold">Nom <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="userLastName" placeholder="Votre nom" required>
+          </div>
+        </div>
+
+        <div class="text-center mt-4">
+          <button id="startQuizBtn" class="btn btn-success btn-lg px-5">
+            ✨ Commencer le test
+          </button>
+        </div>
+
+        <div class="mt-3 text-center">
+          <small class="text-muted">
+            🔒 <strong>Conforme RGPD</strong> : Vos données restent confidentielles et sont uniquement utilisées pour les statistiques internes
+          </small>
+        </div>
+      </div>
+    </div>
+
     <!-- Introduction démarche -->
-    <div id="introSection" class="card mb-5 shadow-sm border-0" style="background: linear-gradient(135deg, #f5fff5 0%, #e8f5e9 100%);">
+    <div id="introSection" class="card mb-5 shadow-sm border-0" style="background: linear-gradient(135deg, #f5fff5 0%, #e8f5e9 100%); display: none;">
       <div class="card-body p-4">
         <h3 class="text-success mb-3">🌱 Notre démarche</h3>
         <p class="mb-3">
@@ -129,12 +160,6 @@
         <div class="alert alert-success mt-4 mb-0 border-0" style="background-color: rgba(76, 175, 80, 0.1);">
           <strong>✨ Comment ça marche ?</strong> Répondez aux questions → Découvrez votre profil →
           Recevez 3 recommandations personnalisées avec conseils d'entretien !
-        </div>
-
-        <div class="mt-3 text-center">
-          <small class="text-muted">
-            🔒 <strong>Conforme RGPD</strong> : Aucune donnée personnelle collectée, test 100% anonyme
-          </small>
         </div>
       </div>
     </div>
@@ -200,6 +225,7 @@
     // État de l'application
     let questions = [];
     let answers = [];
+    let userData = { firstName: '', lastName: '' };
 
     // Descriptions des familles
     const familyDescriptions = {
@@ -326,13 +352,39 @@
       }
     }
 
+    // Démarrer le quiz
+    function startQuiz() {
+      const firstName = document.getElementById('userFirstName').value.trim();
+      const lastName = document.getElementById('userLastName').value.trim();
+
+      if (!firstName || !lastName) {
+        alert('Veuillez renseigner vos nom et prénom');
+        return;
+      }
+
+      userData.firstName = firstName;
+      userData.lastName = lastName;
+
+      // Sauvegarder dans localStorage
+      localStorage.setItem('plantQuizUser', JSON.stringify(userData));
+
+      // Masquer formulaire, afficher intro et questions
+      document.getElementById('userFormSection').style.display = 'none';
+      document.getElementById('introSection').style.display = 'block';
+      document.getElementById('questionsContainer').style.display = 'block';
+      document.getElementById('progressBar').style.display = 'block';
+    }
+
     // Soumettre réponses
     async function submitAnswers() {
       try {
         const result = await apiCall('/api/submit', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ answers })
+          body: JSON.stringify({
+            answers,
+            user: userData
+          })
         });
         displayResult(result);
       } catch (err) {
@@ -358,7 +410,7 @@
       const plantsContainer = document.getElementById('plantsContainer');
       plantsContainer.innerHTML = '';
 
-      result.plants.forEach(plant => {
+      result.plants.forEach((plant, idx) => {
         const col = document.createElement('div');
         col.className = 'col-md-4';
         // Construire le chemin de l'image en tenant compte du BASE_PATH
@@ -366,7 +418,7 @@
           ? plant.image
           : (APP_CONFIG.basePath ? `${APP_CONFIG.basePath}/${plant.image}` : plant.image);
         col.innerHTML = `
-          <div class="card plant-card h-100 shadow-sm">
+          <div class="card plant-card h-100 shadow-sm" id="plant-card-${idx}">
             <div class="card-body">
               <div class="text-center mb-3">
                 <img src="${imagePath}" alt="${plant.name}" class="img-fluid" style="max-height: 250px; object-fit: contain; width: 100%; border: 3px solid #e0e0e0; border-radius: 12px; padding: 15px; background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
@@ -386,14 +438,26 @@
               <h6 class="text-success">📊 Difficulté</h6>
               <p class="mb-2">${plant.care.difficulte}</p>
 
-              <div class="alert alert-success mt-3 mb-0">
+              <div class="alert alert-success mt-3 mb-3">
                 <strong>✨ Avantages :</strong><br>
                 ${plant.benefits}
+              </div>
+
+              <button class="btn btn-success w-100 adopt-btn" data-plant-name="${plant.name}">
+                🌿 J'adopte cette plante !
+              </button>
+              <div class="alert alert-info mt-2 d-none adopted-message">
+                <strong>✅ Plante adoptée !</strong>
               </div>
             </div>
           </div>
         `;
         plantsContainer.appendChild(col);
+      });
+
+      // Ajouter événements sur les boutons d'adoption
+      document.querySelectorAll('.adopt-btn').forEach(btn => {
+        btn.addEventListener('click', handleAdoption);
       });
 
       document.getElementById('resultContainer').style.display = 'block';
@@ -403,11 +467,18 @@
     // Réinitialiser le test
     function resetQuiz() {
       localStorage.removeItem('plantQuizAnswers');
+      localStorage.removeItem('plantQuizUser');
       answers = new Array(questions.length).fill(null);
+      userData = { firstName: '', lastName: '' };
 
       document.getElementById('resultContainer').style.display = 'none';
-      document.getElementById('questionsContainer').style.display = 'block';
-      document.getElementById('introSection').style.display = 'block';
+      document.getElementById('questionsContainer').style.display = 'none';
+      document.getElementById('introSection').style.display = 'none';
+      document.getElementById('progressBar').style.display = 'none';
+      document.getElementById('userFormSection').style.display = 'block';
+
+      document.getElementById('userFirstName').value = '';
+      document.getElementById('userLastName').value = '';
 
       renderQuestions();
       updateProgress();
@@ -415,11 +486,56 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    // Gérer adoption de plante
+    async function handleAdoption(e) {
+      const plantName = e.target.dataset.plantName;
+
+      try {
+        await apiCall('/api/adopt', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user: userData,
+            plantName: plantName
+          })
+        });
+
+        // Désactiver tous les boutons et afficher message de confirmation
+        document.querySelectorAll('.adopt-btn').forEach(btn => {
+          btn.disabled = true;
+          btn.classList.remove('btn-success');
+          btn.classList.add('btn-secondary');
+        });
+
+        // Afficher message de confirmation sur la plante choisie
+        e.target.classList.remove('btn-secondary');
+        e.target.classList.add('btn-success');
+        e.target.textContent = '✅ Adoptée !';
+        e.target.parentElement.querySelector('.adopted-message').classList.remove('d-none');
+
+      } catch (err) {
+        alert('Erreur lors de l\'adoption');
+        console.error(err);
+      }
+    }
+
+    // Restaurer utilisateur depuis localStorage
+    function restoreUser() {
+      const saved = localStorage.getItem('plantQuizUser');
+      if (saved) {
+        userData = JSON.parse(saved);
+        document.getElementById('userFirstName').value = userData.firstName;
+        document.getElementById('userLastName').value = userData.lastName;
+      }
+    }
+
     // Événements
+    document.getElementById('startQuizBtn').addEventListener('click', startQuiz);
     document.getElementById('submitBtn').addEventListener('click', submitAnswers);
     document.getElementById('resetBtn').addEventListener('click', resetQuiz);
 
     // Initialisation
+    restoreUser();
     loadQuestions();
   </script>
 </body>
