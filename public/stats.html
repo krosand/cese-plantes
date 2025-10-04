@@ -209,6 +209,14 @@
     let questions = [];
     let adoptions = [];
 
+    // Instances des graphiques
+    let charts = {
+      familyChart: null,
+      pieChart: null,
+      timelineChart: null,
+      question1Chart: null
+    };
+
     // Couleurs pour les familles
     const familyColors = {
       'Dépolluante': '#4caf50',
@@ -251,9 +259,17 @@
 
     // Créer graphiques
     function renderCharts() {
+      // Détruire les graphiques existants avant de les recréer
+      Object.keys(charts).forEach(key => {
+        if (charts[key]) {
+          charts[key].destroy();
+          charts[key] = null;
+        }
+      });
+
       // 1. Histogramme distribution familles
       const familyData = Object.entries(stats.familyDistribution);
-      new Chart(document.getElementById('familyChart'), {
+      charts.familyChart = new Chart(document.getElementById('familyChart'), {
         type: 'bar',
         data: {
           labels: familyData.map(([family]) => family),
@@ -276,7 +292,7 @@
       });
 
       // 2. Camembert familles
-      new Chart(document.getElementById('pieChart'), {
+      charts.pieChart = new Chart(document.getElementById('pieChart'), {
         type: 'pie',
         data: {
           labels: familyData.map(([family]) => family),
@@ -299,7 +315,7 @@
         new Date(a.date) - new Date(b.date)
       );
 
-      new Chart(document.getElementById('timelineChart'), {
+      charts.timelineChart = new Chart(document.getElementById('timelineChart'), {
         type: 'line',
         data: {
           labels: sortedTimeline.map(t => new Date(t.date).toLocaleDateString('fr-FR')),
@@ -330,7 +346,7 @@
         const labels = questions[0].choices.map(c => c.label.substring(0, 30) + '...');
         const values = Object.values(q1Data);
 
-        new Chart(document.getElementById('question1Chart'), {
+        charts.question1Chart = new Chart(document.getElementById('question1Chart'), {
           type: 'doughnut',
           data: {
             labels: labels,
