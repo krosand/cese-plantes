@@ -8,6 +8,31 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const BASE_PATH = process.env.BASE_PATH || ''; // Chemin de base configurable via variable d'environnement
 
+// Identifiants admin (depuis .env ou par défaut)
+const ADMIN_USER = process.env.ADMIN_USER || 'admlecese';
+const ADMIN_PASS = process.env.ADMIN_PASS || 'Lecese2025.';
+
+// Middleware d'authentification Basic
+function basicAuth(req, res, next) {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith('Basic ')) {
+    res.setHeader('WWW-Authenticate', 'Basic realm="Administration CESE"');
+    return res.status(401).send('Authentification requise');
+  }
+
+  const base64Credentials = authHeader.split(' ')[1];
+  const credentials = Buffer.from(base64Credentials, 'base64').toString('utf8');
+  const [username, password] = credentials.split(':');
+
+  if (username === ADMIN_USER && password === ADMIN_PASS) {
+    next();
+  } else {
+    res.setHeader('WWW-Authenticate', 'Basic realm="Administration CESE"');
+    return res.status(401).send('Identifiants incorrects');
+  }
+}
+
 // Configuration multer pour upload d'images
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -36,6 +61,15 @@ const upload = multer({
 
 // Middleware
 app.use(express.json());
+
+// Routes protégées par authentification (stats et admin)
+app.get((BASE_PATH || '') + '/stats.html', basicAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'stats.html'));
+});
+
+app.get((BASE_PATH || '') + '/admin.html', basicAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
 
 // Servir les fichiers statiques avec ou sans BASE_PATH
 if (BASE_PATH) {
@@ -212,8 +246,8 @@ app.get((BASE_PATH || '') + '/api/plants/:family', (req, res) => {
   }
 });
 
-// GET /plante/api/stats/summary - Statistiques agrégées
-app.get((BASE_PATH || '') + '/api/stats/summary', (req, res) => {
+// GET /plante/api/stats/summary - Statistiques agrégées (protégé)
+app.get((BASE_PATH || '') + '/api/stats/summary', basicAuth, (req, res) => {
   const results = readNDJSON(RESULTS_FILE);
 
   const summary = {
@@ -286,8 +320,8 @@ app.get((BASE_PATH || '') + '/api/stats/summary', (req, res) => {
   res.json(summary);
 });
 
-// GET /plante/api/stats/adoptions - Liste des adoptions avec utilisateurs
-app.get((BASE_PATH || '') + '/api/stats/adoptions', (req, res) => {
+// GET /plante/api/stats/adoptions - Liste des adoptions avec utilisateurs (protégé)
+app.get((BASE_PATH || '') + '/api/stats/adoptions', basicAuth, (req, res) => {
   const results = readNDJSON(RESULTS_FILE);
 
   const adoptions = results
@@ -354,13 +388,13 @@ app.post((BASE_PATH || '') + '/api/adopt', (req, res) => {
 // === ROUTES ADMIN ===
 
 // GET /plante/api/admin/questions - Récupérer questions pour édition
-app.get((BASE_PATH || '') + '/api/admin/questions', (req, res) => {
+app.get((BASE_PATH || '') + '/api/admin/questions', basicAuth, (req, res) => {
   const questions = readJSON(QUESTIONS_FILE);
   res.json(questions || []);
 });
 
 // PUT /plante/api/admin/questions - Modifier questions
-app.put((BASE_PATH || '') + '/api/admin/questions', (req, res) => {
+app.put((BASE_PATH || '') + '/api/admin/questions', basicAuth, (req, res) => {
   const { questions } = req.body;
 
   if (!questions || !Array.isArray(questions)) {
@@ -375,13 +409,13 @@ app.put((BASE_PATH || '') + '/api/admin/questions', (req, res) => {
 });
 
 // GET /plante/api/admin/plants - Récupérer plantes pour édition
-app.get((BASE_PATH || '') + '/api/admin/plants', (req, res) => {
+app.get((BASE_PATH || '') + '/api/admin/plants', basicAuth, (req, res) => {
   const plants = readJSON(PLANTS_FILE);
   res.json(plants || {});
 });
 
 // PUT /plante/api/admin/plants - Modifier plantes
-app.put((BASE_PATH || '') + '/api/admin/plants', (req, res) => {
+app.put((BASE_PATH || '') + '/api/admin/plants', basicAuth, (req, res) => {
   const { plants } = req.body;
 
   if (!plants || typeof plants !== 'object') {
@@ -396,7 +430,7 @@ app.put((BASE_PATH || '') + '/api/admin/plants', (req, res) => {
 });
 
 // POST /plante/api/admin/upload-image - Upload image de plante
-app.post((BASE_PATH || '') + '/api/admin/upload-image', upload.single('image'), (req, res) => {
+app.post((BASE_PATH || '') + '/api/admin/upload-image', basicAuth, upload.single('image'), (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'Aucune image fournie' });
@@ -413,7 +447,7 @@ app.post((BASE_PATH || '') + '/api/admin/upload-image', upload.single('image'), 
 });
 
 // POST /plante/api/admin/seed - Générer données simulées
-app.post((BASE_PATH || '') + '/api/admin/seed', (req, res) => {
+app.post((BASE_PATH || '') + '/api/admin/seed', basicAuth, (req, res) => {
   const { count = 50 } = req.body;
   const questions = readJSON(QUESTIONS_FILE);
   const families = ['Dépolluante', 'Grimpante', 'Exotique', 'Résistante'];
@@ -453,7 +487,7 @@ app.post((BASE_PATH || '') + '/api/admin/seed', (req, res) => {
 });
 
 // DELETE /plante/api/admin/clear-all - Supprimer toutes les données
-app.delete((BASE_PATH || '') + '/api/admin/clear-all', (req, res) => {
+app.delete((BASE_PATH || '') + '/api/admin/clear-all', basicAuth, (req, res) => {
   try {
     // Vider le fichier results.ndjson
     fs.writeFileSync(RESULTS_FILE, '', 'utf8');
@@ -472,7 +506,7 @@ app.delete((BASE_PATH || '') + '/api/admin/clear-all', (req, res) => {
 });
 
 // GET /plante/api/admin/export - Exporter résultats
-app.get((BASE_PATH || '') + '/api/admin/export', (req, res) => {
+app.get((BASE_PATH || '') + '/api/admin/export', basicAuth, (req, res) => {
   const { format = 'csv' } = req.query;
   const results = readNDJSON(RESULTS_FILE);
 
