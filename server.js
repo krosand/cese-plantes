@@ -161,6 +161,15 @@ app.post((BASE_PATH || '') + '/api/submit', (req, res) => {
     return res.status(400).json({ error: 'Nom et prénom requis' });
   }
 
+  if (!user.email) {
+    return res.status(400).json({ error: 'Email requis' });
+  }
+
+  // Validation du domaine @lecese.fr
+  if (!user.email.toLowerCase().endsWith('@lecese.fr')) {
+    return res.status(403).json({ error: 'Seuls les emails @lecese.fr sont autorisés' });
+  }
+
   // Calculer la famille recommandée
   const { family, scores } = calculateFamily(answers);
 
@@ -173,7 +182,8 @@ app.post((BASE_PATH || '') + '/api/submit', (req, res) => {
     timestamp: new Date().toISOString(),
     user: {
       firstName: user.firstName,
-      lastName: user.lastName
+      lastName: user.lastName,
+      email: user.email.toLowerCase()
     },
     answers,
     family,
@@ -286,6 +296,7 @@ app.get((BASE_PATH || '') + '/api/stats/adoptions', (req, res) => {
       timestamp: r.timestamp,
       firstName: r.user.firstName,
       lastName: r.user.lastName,
+      email: r.user.email || null,
       family: r.family,
       plantName: r.plantName || null
     }))
@@ -467,10 +478,14 @@ app.get((BASE_PATH || '') + '/api/admin/export', (req, res) => {
 
   if (format === 'csv') {
     // Convertir en CSV
-    let csv = 'Timestamp,Family,Completed,Scores\n';
+    let csv = 'Timestamp,Prénom,Nom,Email,Family,PlanteName,Completed,Scores\n';
     results.forEach(r => {
       const scoresStr = JSON.stringify(r.scores).replace(/,/g, ';');
-      csv += `${r.timestamp},${r.family},${r.completed},${scoresStr}\n`;
+      const firstName = r.user ? r.user.firstName : '';
+      const lastName = r.user ? r.user.lastName : '';
+      const email = r.user && r.user.email ? r.user.email : '';
+      const plantName = r.plantName || '';
+      csv += `${r.timestamp},"${firstName}","${lastName}","${email}",${r.family},"${plantName}",${r.completed},${scoresStr}\n`;
     });
 
     res.setHeader('Content-Type', 'text/csv');

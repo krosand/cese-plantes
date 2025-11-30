@@ -100,6 +100,14 @@
             <label for="userLastName" class="form-label fw-bold">Nom <span class="text-danger">*</span></label>
             <input type="text" class="form-control" id="userLastName" placeholder="Votre nom" required>
           </div>
+          <div class="col-12">
+            <label for="userEmail" class="form-label fw-bold">Email professionnel <span class="text-danger">*</span></label>
+            <input type="email" class="form-control" id="userEmail" placeholder="prenom.nom@lecese.fr" required>
+            <div class="form-text">Seuls les emails @lecese.fr sont autorisés</div>
+            <div id="emailError" class="alert alert-danger mt-2 d-none">
+              <strong>Accès réservé</strong> : Ce questionnaire est réservé aux collaborateurs du CESE. Seules les personnes disposant d'une adresse email @lecese.fr peuvent participer.
+            </div>
+          </div>
         </div>
 
         <div class="text-center mt-4">
@@ -225,7 +233,7 @@
     // État de l'application
     let questions = [];
     let answers = [];
-    let userData = { firstName: '', lastName: '' };
+    let userData = { firstName: '', lastName: '', email: '' };
 
     // Descriptions des familles
     const familyDescriptions = {
@@ -356,14 +364,32 @@
     function startQuiz() {
       const firstName = document.getElementById('userFirstName').value.trim();
       const lastName = document.getElementById('userLastName').value.trim();
+      const email = document.getElementById('userEmail').value.trim().toLowerCase();
+      const emailError = document.getElementById('emailError');
+
+      // Réinitialiser l'erreur
+      emailError.classList.add('d-none');
 
       if (!firstName || !lastName) {
         alert('Veuillez renseigner vos nom et prénom');
         return;
       }
 
+      if (!email) {
+        alert('Veuillez renseigner votre email professionnel');
+        return;
+      }
+
+      // Validation du domaine @lecese.fr
+      if (!email.endsWith('@lecese.fr')) {
+        emailError.classList.remove('d-none');
+        document.getElementById('userEmail').focus();
+        return;
+      }
+
       userData.firstName = firstName;
       userData.lastName = lastName;
+      userData.email = email;
 
       // Sauvegarder dans localStorage
       localStorage.setItem('plantQuizUser', JSON.stringify(userData));
@@ -469,7 +495,7 @@
       localStorage.removeItem('plantQuizAnswers');
       localStorage.removeItem('plantQuizUser');
       answers = new Array(questions.length).fill(null);
-      userData = { firstName: '', lastName: '' };
+      userData = { firstName: '', lastName: '', email: '' };
 
       document.getElementById('resultContainer').style.display = 'none';
       document.getElementById('questionsContainer').style.display = 'none';
@@ -479,6 +505,8 @@
 
       document.getElementById('userFirstName').value = '';
       document.getElementById('userLastName').value = '';
+      document.getElementById('userEmail').value = '';
+      document.getElementById('emailError').classList.add('d-none');
 
       renderQuestions();
       updateProgress();
@@ -510,8 +538,11 @@
         // Afficher message de confirmation sur la plante choisie
         e.target.classList.remove('btn-secondary');
         e.target.classList.add('btn-success');
-        e.target.textContent = '✅ Adoptée !';
+        e.target.textContent = '✅ Plante adoptée !';
         e.target.parentElement.querySelector('.adopted-message').classList.remove('d-none');
+
+        // Afficher notification de remerciement
+        showThankYouNotification();
 
       } catch (err) {
         alert('Erreur lors de l\'adoption');
@@ -519,13 +550,41 @@
       }
     }
 
+    // Afficher notification de remerciement
+    function showThankYouNotification() {
+      // Créer la notification si elle n'existe pas
+      let notification = document.getElementById('thankYouNotification');
+      if (!notification) {
+        notification = document.createElement('div');
+        notification.id = 'thankYouNotification';
+        notification.className = 'position-fixed top-0 start-50 translate-middle-x mt-4 p-4 bg-success text-white rounded shadow-lg';
+        notification.style.zIndex = '9999';
+        notification.style.maxWidth = '400px';
+        notification.innerHTML = `
+          <div class="text-center">
+            <div class="fs-1 mb-2">🌿</div>
+            <h5 class="fw-bold">Merci pour votre participation !</h5>
+            <p class="mb-0">L'équipe RSO reviendra vers vous rapidement.</p>
+          </div>
+        `;
+        document.body.appendChild(notification);
+      }
+      notification.style.display = 'block';
+
+      // Masquer après 5 secondes
+      setTimeout(() => {
+        notification.style.display = 'none';
+      }, 5000);
+    }
+
     // Restaurer utilisateur depuis localStorage
     function restoreUser() {
       const saved = localStorage.getItem('plantQuizUser');
       if (saved) {
         userData = JSON.parse(saved);
-        document.getElementById('userFirstName').value = userData.firstName;
-        document.getElementById('userLastName').value = userData.lastName;
+        document.getElementById('userFirstName').value = userData.firstName || '';
+        document.getElementById('userLastName').value = userData.lastName || '';
+        document.getElementById('userEmail').value = userData.email || '';
       }
     }
 
